@@ -201,7 +201,7 @@ try {
         renderer.setViewport(x, y, w, h); renderer.setScissor(x, y, w, h); renderer.setScissorTest(true);
         renderer.clearDepth();
         renderer.render(e.sc, e.cam);
-        if (e.labels.length) {
+        if (e.labels.length) try {
           const op = Math.max(0, Math.min(1, (explodeK(t) - 0.5) / 0.4));
           const W2 = r.width / sc, H2 = r.height / sc;
           e.labels.forEach((l) => {
@@ -210,7 +210,7 @@ try {
             l.d.style.transform = 'translate(' + ((wp.x * 0.5 + 0.5) * W2 + 30).toFixed(1) + 'px,' + ((-wp.y * 0.5 + 0.5) * H2 - 14).toFixed(1) + 'px)';
             l.d.style.opacity = op;
           });
-        }
+        } catch (err) { console.error('[v5] etiket hatası', err); }
       });
       renderer.setScissorTest(false);
       renderer.setViewport(0, 0, curW, curH);
