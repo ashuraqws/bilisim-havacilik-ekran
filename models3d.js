@@ -211,42 +211,73 @@ function airliner(acc) {
   } };
 }
 
-/* ---------- Bütünleşik kanat-gövde (geleceğin uçağı) ---------- */
+/* ---------- Geleceğin uçağı: elektrikli fanlar + hidrojen tankı ---------- */
 function bwb(acc) {
-  const g = new THREE.Group(), body = new THREE.Group();
-  g.add(body);
-  const skinM = MP({ color: 0x5a7bb0, metalness: 0.7, roughness: 0.3, clearcoat: 0.8, clearcoatRoughness: 0.15, side: THREE.DoubleSide });
-  const innerM = M({ color: 0x9aa7bb, metalness: 0.9, roughness: 0.35 });
-  const outline = [[0, 4.4], [1.0, 3.0], [5.0, -1.2], [5.0, -1.8], [1.8, -2.0], [0.9, -2.6], [0, -2.4], [-0.9, -2.6], [-1.8, -2.0], [-5.0, -1.8], [-5.0, -1.2], [-1.0, 3.0]];
-  const geo = wingGeo(outline, 0.12);
-  const topSkin = new THREE.Mesh(geo, skinM); topSkin.position.y = 0.3;
-  const botSkin = new THREE.Mesh(geo, skinM); botSkin.position.y = -0.25;
-  const inner = new THREE.Group();
-  for (let i = -8; i <= 8; i++) {
-    const x = i * 0.55, ax = Math.abs(x);
-    const front = ax < 1.0 ? 4.4 - ax * 1.4 : 3.0 - (ax - 1.0) * 1.05, back = ax < 0.9 ? -2.5 : -1.9;
-    inner.add(box(0.05, 0.4, front - back, innerM, x, 0, (front + back) / 2));
-  }
-  [-1, 0, 1].forEach((i) => inner.add(box(9.6, 0.08, 0.1, innerM, 0, 0.1, i * 1.2)));
-  const cabin = new THREE.Mesh(new THREE.SphereGeometry(1, 24, 16), new THREE.MeshBasicMaterial({ color: acc, transparent: true, opacity: 0.28, toneMapped: false, depthWrite: false }));
-  cabin.scale.set(1.5, 0.3, 2.6); cabin.position.set(0, 0.02, 0.8);
-  const engines = [-1, 1].map((sd) => {
-    const e = new THREE.Group();
-    const c = cyl(0.38, 0.38, 1.6, M({ color: 0xc6cedb, metalness: 0.9, roughness: 0.25 }), 24); c.rotation.x = Math.PI / 2;
-    const ring = new THREE.Mesh(new THREE.TorusGeometry(0.38, 0.05, 8, 32), glow(acc, 1.4)); ring.position.z = 0.8;
-    e.add(c, ring);
-    e.position.set(sd * 1.1, 0.7, -1.6);
-    body.add(e);
-    return part(e, [sd * 1.0, 2.4, -0.6], sd > 0 ? 'Elektrikli motor' : undefined);
-  });
-  body.add(topSkin, botSkin, inner, cabin);
-  const parts = [part(topSkin, [0, 2.0, 0], 'Üst kaplama'), part(botSkin, [0, -2.0, 0], 'Alt kaplama'), part(cabin, [0, 0.4, 0.3], 'Yolcu kabini'), ...engines];
-  body.rotation.x = 0.7;
-  return { group: g, parts, dist: 12.5, update(t) {
+  const g = new THREE.Group(), plane = new THREE.Group();
+  g.add(plane);
+  const white = MP({ color: 0xf2f5fa, metalness: 0.25, roughness: 0.25, side: THREE.DoubleSide, clearcoat: 0.8, clearcoatRoughness: 0.12 });
+  const grey = M({ color: 0xaab6c9, metalness: 0.85, roughness: 0.3, side: THREE.DoubleSide });
+  const accent = M({ color: acc, metalness: 0.4, roughness: 0.35, side: THREE.DoubleSide });
+  const prof = [[0.02, 5.0], [0.3, 4.8], [0.52, 4.1], [0.62, 3.0], [0.64, 1.5], [0.64, -1.5], [0.56, -3.0], [0.38, -4.2], [0.16, -5.0], [0.05, -5.4]];
+  const fus = new THREE.Mesh(new THREE.LatheGeometry(prof.map(([r, y]) => new THREE.Vector2(r, y)), 48), white);
+  fus.rotation.x = Math.PI / 2;
+  const cockpit = new THREE.Mesh(new THREE.SphereGeometry(0.26, 12, 8), M({ color: 0x0a1a30, metalness: 0.2, roughness: 0.1 }));
+  cockpit.scale.set(1, 0.55, 0.7); cockpit.position.set(0, 0.32, 4.1);
+  const stripe = new THREE.Mesh(new THREE.CylinderGeometry(0.655, 0.655, 0.07, 32, 1, true), accent);
+  stripe.rotation.x = Math.PI / 2; stripe.position.z = 2.2;
+  const body = grp(fus, stripe);
+  // yüksek, uzun ve ince kanatlar + destek çubukları
+  const wingR = new THREE.Mesh(wingGeo([[0.55, 0.7], [6.8, -1.1], [6.8, -1.6], [0.55, -1.3]], 0.09), grey);
+  wingR.position.y = 0.5;
+  const strutR = box(0.05, 1.5, 0.12, grey, 3.0, 0.0, -0.1); strutR.rotation.z = -0.62;
+  const wingRG = grp(wingR, strutR);
+  const wingLG = grp(wingR.clone(), strutR.clone());
+  wingLG.scale.x = -1;
+  // elektrikli kanatlı fanlar (kanat başına 2)
+  const fans = [], fanParts = [];
+  [-1, 1].forEach((sd) => [2.7, 4.8].forEach((x, idx) => {
+    const f = new THREE.Group();
+    const duct = cyl(0.34, 0.34, 0.55, grey, 28); duct.rotation.x = Math.PI / 2;
+    const rim = new THREE.Mesh(new THREE.TorusGeometry(0.34, 0.035, 8, 32), glow(acc, 1.4)); rim.position.z = 0.28;
+    const hub = new THREE.Mesh(new THREE.SphereGeometry(0.1, 12, 8), M({ color: 0xdfe6f2, metalness: 1, roughness: 0.2 }));
+    const rotor = new THREE.Group();
+    for (let i = 0; i < 6; i++) { const bl = box(0.3, 0.02, 0.09, M({ color: 0x1c2638, metalness: 0.7, roughness: 0.4 }), 0.17, 0, 0); bl.rotation.y = 0; const w = new THREE.Group(); w.rotation.z = (i / 6) * Math.PI * 2; w.add(bl); rotor.add(w); }
+    rotor.position.z = 0.1;
+    f.add(duct, rim, hub, rotor, box(0.07, 0.35, 0.5, grey, 0, 0.3, -0.05));
+    f.position.set(sd * x, 0.12, 0.05);
+    plane.add(f);
+    fans.push(rotor);
+    fanParts.push(part(f, [sd * 1.2, -1.5, 0.7], sd > 0 && idx === 0 ? 'Elektrikli fan' : undefined));
+  }));
+  // T kuyruk
+  const fg = new THREE.Shape();
+  [[-3.4, 0.4], [-4.9, 2.2], [-5.4, 2.2], [-5.3, 0.3]].forEach(([a2, b2], i) => (i ? fg.lineTo(a2, b2) : fg.moveTo(a2, b2)));
+  const fin = new THREE.Mesh(new THREE.ExtrudeGeometry(fg, { depth: 0.09, bevelEnabled: false }), accent);
+  fin.geometry.translate(0, 0, -0.045); fin.rotation.y = -Math.PI / 2;
+  const stab = new THREE.Mesh(wingGeo([[0.0, -4.7], [2.0, -5.5], [2.0, -5.85], [0.0, -5.3]], 0.07), grey);
+  stab.position.y = 2.2;
+  const stabL = stab.clone(); stabL.scale.x = -1;
+  const tail = grp(fin, stab, stabL);
+  // hidrojen tankı ve batarya (gövdenin içinde, açılınca dışarı çıkar)
+  const tank = new THREE.Group();
+  const shell = new THREE.Mesh(new THREE.CapsuleGeometry(0.42, 2.2, 8, 20), new THREE.MeshPhysicalMaterial({ color: acc, transparent: true, opacity: 0.42, metalness: 0.2, roughness: 0.1, clearcoat: 1, side: THREE.DoubleSide, depthWrite: false }));
+  shell.rotation.x = Math.PI / 2;
+  [-0.8, 0, 0.8].forEach((z) => { const ring = new THREE.Mesh(new THREE.TorusGeometry(0.43, 0.025, 8, 32), glow(acc, 1.3)); ring.position.z = z; tank.add(ring); });
+  tank.add(shell); tank.position.set(0, 0.02, -1.0);
+  const battery = new THREE.Group();
+  battery.add(box(0.9, 0.28, 1.7, M({ color: 0x1a2438, metalness: 0.8, roughness: 0.35 })), box(0.92, 0.04, 1.4, glow(acc, 1.2), 0, 0.1, 0));
+  battery.position.set(0, -0.2, 1.7);
+  plane.add(body, cockpit, wingRG, wingLG, tail, tank, battery);
+  const parts = [part(wingRG, [3.2, 0.2, 0], 'Uzun ince kanat'), part(wingLG, [-3.2, 0.2, 0]), part(tail, [0, 1.6, -1.6], 'T kuyruk'),
+    part(tank, [0, 2.4, -0.6], 'Hidrojen tankı'), part(battery, [0, -2.2, 0.6], 'Batarya'), part(cockpit, [0, 1.3, 0.6]), ...fanParts];
+  return { group: g, parts, dist: 18.5, update(t) {
     const e = explodeK(t);
     spread(parts, e);
-    body.scale.setScalar(1 - 0.22 * e);
-    body.rotation.y = t * 0.3;
+    plane.scale.setScalar(1 - 0.3 * e);
+    fans.forEach((r) => { r.rotation.z = t * 25; });
+    plane.rotation.y = t * 0.25;
+    plane.rotation.z = Math.sin(t * 0.6) * 0.06;
+    plane.rotation.x = 0.22;
   } };
 }
 
