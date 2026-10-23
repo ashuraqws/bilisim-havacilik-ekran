@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bilişim ve Havacılık</title>
+<style>
+@property --ac{syntax:'<color>';inherits:true;initial-value:#35d0ff}
+@property --ac2{syntax:'<color>';inherits:true;initial-value:#7b8cff}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#050914;cursor:none;user-select:none}
+*{box-sizing:border-box}
+#stage{position:absolute;left:50%;top:50%;width:1920px;height:1080px;transform-origin:center;overflow:hidden;
+  font-family:'Segoe UI','Inter',system-ui,sans-serif;color:#eaf2ff;background:#050914;
+  --ac:#35d0ff;--ac2:#7b8cff;transition:--ac 1.2s,--ac2 1.2s}
+#stage[data-topic=havacilik]{--ac:#ffb347;--ac2:#ff6b4a}
+#stage[data-topic=atolye]{--ac:#6dffb0;--ac2:#35d0ff}
+.vslide{display:block;padding:0;background:#000}
+.vslide video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000}
+.vslide .top{z-index:3;text-shadow:0 2px 12px #000}
+.vslide .vcap{position:absolute;left:0;right:0;bottom:0;padding:90px 110px 50px;font-size:56px;font-weight:800;background:linear-gradient(transparent,rgba(0,0,0,.75))}
+.bg{position:absolute;inset:0;overflow:hidden}
+.bg i{position:absolute;border-radius:50%;filter:blur(120px);opacity:.28}
+.bg .b1{width:900px;height:900px;left:-200px;top:-250px;background:var(--ac);animation:d1 40s ease-in-out infinite alternate}
+.bg .b2{width:800px;height:800px;right:-200px;bottom:-300px;background:var(--ac2);animation:d2 52s ease-in-out infinite alternate}
+.bg .grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:80px 80px;animation:g 30s linear infinite}
+@keyframes d1{to{transform:translate(300px,200px)}}
+@keyframes d2{to{transform:translate(-300px,-160px)}}
+@keyframes g{to{background-position:80px 80px}}
+#slides{position:absolute;inset:0}
+.slide{position:absolute;inset:0;padding:150px 110px 120px;display:grid;grid-template-columns:1fr 780px;gap:60px;align-items:center}
+.top{position:absolute;left:110px;right:110px;top:56px;display:flex;justify-content:space-between;align-items:center}
+.tag{font-size:28px;font-weight:700;letter-spacing:.18em;color:var(--ac);padding:10px 26px;border:2px solid var(--ac);border-radius:40px;background:color-mix(in srgb,var(--ac) 14%,transparent)}
+.cnt{font-size:28px;font-weight:600;letter-spacing:.12em;color:rgba(255,255,255,.5)}
+h1{margin:0 0 24px;padding-bottom:.12em;font-size:100px;line-height:1.14;font-weight:800;letter-spacing:-.02em;background:linear-gradient(90deg,#fff,var(--ac));-webkit-background-clip:text;background-clip:text;color:transparent}
+ul{list-style:none;margin:0;padding:0}
+li{position:relative;font-size:36px;line-height:1.25;padding-left:44px;margin-bottom:16px;color:#dbe6fb;opacity:0;transform:translateX(-40px)}
+li::before{content:"";position:absolute;left:0;top:.5em;width:20px;height:20px;border-radius:6px;background:var(--ac);box-shadow:0 0 18px var(--ac)}
+.live li{animation:li .8s cubic-bezier(.2,.8,.2,1) var(--d) forwards}
+.live h1{animation:h .9s cubic-bezier(.2,.8,.2,1) both}
+@keyframes li{to{opacity:1;transform:none}}
+@keyframes h{from{opacity:0;transform:translateY(40px)}}
+.vis{width:780px;height:780px;border-radius:44px;background:linear-gradient(160deg,rgba(14,24,48,.82),rgba(6,10,24,.7));border:2px solid color-mix(in srgb,var(--ac) 38%,transparent);padding:50px;box-shadow:0 0 90px color-mix(in srgb,var(--ac) 16%,transparent),0 40px 120px rgba(0,0,0,.5)}
+#bg{position:absolute;left:0;top:0;width:1920px;height:1080px}
+#stage.gl .bg i{display:none}
+.bg::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 50% 45%,transparent 45%,rgba(2,5,14,.7) 100%)}
+.vis.v3{background:radial-gradient(circle at 50% 50%,rgba(255,255,255,.035),transparent 70%);box-shadow:none;padding:0}
+.v3d{width:100%;height:100%;position:relative;overflow:hidden;border-radius:44px}
+.lbl{position:absolute;left:0;top:0;font:700 21px 'Segoe UI',system-ui,sans-serif;color:#fff;background:rgba(6,12,28,.8);border-left:3px solid var(--ac);padding:3px 10px;white-space:nowrap;pointer-events:none;will-change:transform,opacity}
+.lbl::before{content:"";position:absolute;right:100%;top:50%;width:30px;height:2px;background:var(--ac)}
+.eyebrow{display:flex;align-items:center;gap:22px;margin-bottom:14px;font-size:28px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--ac)}
+.eyebrow .dots{display:flex;gap:10px}
+.eyebrow .dots i{width:14px;height:14px;border-radius:50%;border:2px solid var(--ac);opacity:.55}
+.eyebrow .dots i.on{background:var(--ac);opacity:1;box-shadow:0 0 14px var(--ac)}
+.gs .st,.gt .gr,.gc .cd{border-left:6px solid var(--ac)}
+.svg{width:100%;height:100%;overflow:visible}
+.fun{position:absolute;left:110px;right:110px;bottom:34px;font-size:30px;color:rgba(255,255,255,.88);background:rgba(8,14,30,.6);border-left:6px solid var(--ac);border-radius:18px;padding:16px 28px}
+.fun b{color:var(--ac);letter-spacing:.14em;margin-right:14px}
+#bar{position:absolute;left:0;bottom:0;height:8px;width:0;background:linear-gradient(90deg,var(--ac),var(--ac2));z-index:9}
+@keyframes fill{to{width:100%}}
+#sweep{position:absolute;top:0;bottom:0;left:0;width:520px;z-index:8;opacity:0;pointer-events:none;
+  background:linear-gradient(90deg,transparent,var(--ac),transparent);mix-blend-mode:screen}
+/* SVG ortak */
+.svg text{fill:#eaf2ff;font-family:inherit;font-weight:700}
+.t{font-size:24px;text-anchor:middle;dominant-baseline:middle}
+.ts{font-size:19px;text-anchor:middle;fill:rgba(255,255,255,.65)!important;font-weight:600}
+.ol{fill:none;stroke:var(--ac);stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.bx{fill:rgba(255,255,255,.05);stroke:var(--ac);stroke-width:3}
+.ac{fill:var(--ac)}
+.pin{stroke:var(--ac);stroke-width:3}
+.wire{fill:none;stroke:var(--ac);stroke-width:4;stroke-dasharray:10 14;animation:dash 1s linear infinite}
+.flow{fill:none;stroke:var(--ac);stroke-width:4;stroke-dasharray:14 18;stroke-linecap:round;animation:dash .8s linear infinite}
+.flow.hot{stroke:#ff6b4a}
+.flow.dn{animation-name:dashr}
+@keyframes dash{to{stroke-dashoffset:-48}}
+@keyframes dashr{to{stroke-dashoffset:-64}}
+.pulse{animation:pulse 2s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+@keyframes pulse{50%{transform:scale(1.07);filter:drop-shadow(0 0 22px var(--ac))}}
+.bit rect{fill:rgba(255,255,255,.04);stroke:var(--ac);stroke-width:3;transition:fill .3s}
+.bit.on rect{fill:var(--ac);fill-opacity:.55}
+.bit text{font-size:46px;text-anchor:middle}
+.layer{fill:rgba(255,255,255,.05);stroke:var(--ac);stroke-width:3;animation:glow 4s ease-in-out infinite}
+@keyframes glow{0%,100%{fill:rgba(255,255,255,.05)}15%,30%{fill:var(--ac);fill-opacity:.45}}
+.fc{transition:all .3s}
+.fc.hl{fill:var(--ac);fill-opacity:.55}
+.nd{fill:var(--ac);transform-box:fill-box;transform-origin:center;animation:nd 2.4s ease-in-out infinite}
+@keyframes nd{0%,100%{opacity:.35;transform:scale(.8)}50%{opacity:1;transform:scale(1.25)}}
+.scan{fill:var(--ac);opacity:.75;animation:scan 3s ease-in-out infinite alternate}
+@keyframes scan{from{transform:translateY(0)}to{transform:translateY(500px)}}
+.code{font:600 36px/1.45 Consolas,'Cascadia Mono',monospace;background:#070d1c;border:2px solid var(--ac);border-radius:24px;padding:36px;height:100%;color:#cfe2ff;white-space:pre}
+#code::after{content:"▌";color:var(--ac);animation:bl 1s steps(2) infinite}
+@keyframes bl{50%{opacity:0}}
+.code .o{color:var(--ac);margin-top:26px;border-top:2px dashed rgba(255,255,255,.2);padding-top:22px;min-height:150px}
+.hz{transform-origin:320px 300px;animation:roll 9s ease-in-out infinite}
+@keyframes roll{0%,100%{transform:rotate(-14deg) translateY(0)}50%{transform:rotate(14deg) translateY(28px)}}
+.zn{opacity:.5;transition:opacity .4s}
+.zn.on{opacity:1;filter:drop-shadow(0 0 16px var(--ac))}
+.lb{opacity:.5;transition:opacity .4s}
+.lb.on{opacity:1}
+.spin{animation:spin .5s linear infinite}
+.spin.r{animation-direction:reverse}
+@keyframes spin{to{transform:rotate(360deg)}}
+.flick{transform-box:fill-box;transform-origin:center;animation:flick .22s linear infinite alternate}
+@keyframes flick{from{transform:scaleX(1)}to{transform:scaleX(.12)}}
+.bob{animation:bob 4s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-14px)}}
+/* Ortak şablonlar: adımlar, tablo, istatistik kartları */
+.gs,.gt,.gc{height:100%;display:flex;flex-direction:column;justify-content:center;gap:16px}
+.gs .st{position:relative;display:flex;align-items:center;gap:26px;padding:20px 26px;border-radius:22px;background:rgba(255,255,255,.05);border:2px solid rgba(255,255,255,.1);font-size:33px;font-weight:600;line-height:1.2}
+.gs .st b{flex:none;width:62px;height:62px;border-radius:50%;display:grid;place-items:center;background:var(--ac);color:#06101f;font-size:32px}
+.gs .st:not(:last-child)::after{content:"";position:absolute;left:56px;top:100%;height:16px;width:3px;background:var(--ac);opacity:.6}
+.gt .gh,.gt .gr{display:grid;grid-template-columns:repeat(var(--n),1fr);gap:16px;align-items:center}
+.gt .gh{font-size:26px;letter-spacing:.14em;color:var(--ac);font-weight:700;padding:0 26px 6px}
+.gt .gr{padding:20px 26px;border-radius:20px;background:rgba(255,255,255,.05);border:2px solid rgba(255,255,255,.1);font-size:32px;font-weight:600}
+.gt .gr span:first-child{color:var(--ac);font-weight:800}
+.gc{display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:1fr;gap:20px}
+.gc .cd{display:flex;flex-direction:column;justify-content:center;gap:12px;padding:24px;border-radius:26px;background:rgba(255,255,255,.05);border:2px solid rgba(255,255,255,.1);text-align:center}
+.gc .n{font-size:58px;font-weight:800;color:var(--ac);line-height:1.05}
+.gc .l{font-size:28px;color:#dbe6fb;font-weight:600;line-height:1.25}
+.live .st,.live .gr,.live .cd{animation:li .7s cubic-bezier(.2,.8,.2,1) var(--d) both}
+.live .st,.live .gr{animation-name:rise}
+.live .cd{animation-name:rise}
+@keyframes rise{from{opacity:0;transform:translateY(30px)}}
+.arr{animation:arr 2s ease-in-out infinite}
+@keyframes arr{50%{opacity:.45}}
+</style>
+</head>
+<body>
+<div id="stage" data-topic="bilisim">
+  <div class="bg"><i class="b1"></i><i class="b2"></i><div class="grid"></div><canvas id="bg" width="1920" height="1080"></canvas></div>
+  <div id="slides"></div>
+  <div id="sweep"></div>
+  <div id="bar"></div>
+</div>
+<script src="videos.js"></script>
+<script src="slides.js"></script>
+<script src="app.js"></script>
+<script type="module" src="bg.js"></script>
+</body>
+</html>
