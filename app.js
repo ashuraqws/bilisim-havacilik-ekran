@@ -103,8 +103,8 @@
     next(back);
   }
   document.addEventListener('keydown', function (e) {
-    if (e.key === 'ArrowRight') gate(true);
-    else if (e.key === 'ArrowLeft') gate(false);
+    if (e.key === 'ArrowRight') gate(false);
+    else if (e.key === 'ArrowLeft') gate(true);
   });
   var tx = 0, ty = 0;
   document.addEventListener('touchstart', function (e) { tx = e.touches[0].clientX; ty = e.touches[0].clientY; }, { passive: true });
