@@ -22,6 +22,17 @@
       pins + '<rect class="bx pulse" x="250" y="250" width="140" height="140" rx="16" style="fill:var(--ac);fill-opacity:.2"/>' + T(320, 320, 'CPU', 't" style="font-size:38px')) };
   }
 
+  function formVis() {
+    return { html: S(
+      '<rect class="bx" x="90" y="60" width="460" height="520" rx="18"/>' +
+      '<rect x="90" y="60" width="460" height="48" rx="18" style="fill:var(--ac);fill-opacity:.35"/>' +
+      T(320, 84, 'Form1', 'ts') +
+      T(150, 170, 'Adın:', 'ts') + '<rect class="bx" x="150" y="190" width="340" height="56" rx="10"/>' + T(320, 224, 'Ahmet') +
+      T(150, 300, 'Yaşın:', 'ts') + '<rect class="bx" x="150" y="320" width="340" height="56" rx="10"/>' + T(320, 354, '16') +
+      '<rect class="bx pulse" x="210" y="440" width="220" height="64" rx="14" style="fill:var(--ac);fill-opacity:.25"/>' + T(320, 474, 'Gönder')
+    ) };
+  }
+
   function ikili() {
     var h = '', i;
     for (i = 0; i < 8; i++) {
@@ -156,9 +167,9 @@
       '<path class="flow" d="M40 200H610"/><path class="flow" d="M40 440H610" style="display:none"/>' +
       '<path class="flow" d="M115 320H300"/><path class="flow hot" d="M390 320H575"/>' + blades +
       '<polygon class="zn z2" points="130,262 300,285 300,355 130,378" style="fill:#2f6aa8;stroke:var(--ac);stroke-width:3"/>' +
-      '<rect class="zn z3" x="310" y="285" width="80" height="70" rx="10" style="fill:#ff6b4a;stroke:#ffb347;stroke-width:3"/>' +
+      '<rect class="zn z3" x="310" y="285" width="80" height="70" rx="10" style="fill:#ff9d00;stroke:#ffdd00;stroke-width:3"/>' +
       '<polygon class="zn z4" points="400,285 470,262 470,378 400,355" style="fill:#6a5acd;stroke:var(--ac);stroke-width:3"/>' +
-      '<polygon class="zn z4" points="480,272 575,292 575,348 480,368" style="fill:#c0413a;stroke:#ffb347;stroke-width:3"/>' +
+      '<polygon class="zn z4" points="480,272 575,292 575,348 480,368" style="fill:#0040ff;stroke:#ffdd00;stroke-width:3"/>' +
       lbl(100, '1', 'EMME', 1) + lbl(215, '2', 'SIKIŞTIRMA', 2) + lbl(350, '3', 'YANMA', 3) + lbl(525, '4', 'EGZOZ', 4) +
       T(320, 150, 'TURBOFAN MOTOR KESİTİ', 't" style="font-size:28px')),
       run: function (root) {
@@ -253,6 +264,9 @@
     { topic: 'bilisim', title: 'Yapay Zekâ', visual: yz, points: [
       'Makine öğrenmesi: veriden örüntü öğrenir', 'Yapay sinir ağı katmanlı düğümlerden oluşur', 'Örnek: görüntü tanıma, çeviri, öneri sistemleri', 'İyi sonuç için kaliteli ve dengeli veri gerekir'],
       fun: 'Bir model ne kadar çeşitli veriyle eğitilirse genellikle o kadar iyi öğrenir.' },
+    { topic: 'bilisim', title: 'Visual Studio ile Form Uygulaması', visual: formVis, points: [
+      'Windows Forms: sürükle-bırak ile pencere tasarlarsın', 'Button, TextBox, Label gibi kontroller eklenir', 'Özellikler penceresinden ayarlar değiştirilir', 'F5 tuşuyla uygulama çalıştırılır'],
+      fun: 'Visual Studio, form tasarımını kodla birlikte yapmanı sağlayan bir geliştirme ortamıdır.' },
 
     { topic: 'havacilik', title: 'Uçuşun Dört Kuvveti', visual: dortKuvvet, points: [
       'Kaldırma: ağırlığa karşı yukarı iter', 'İtki: motorun ürettiği ileri kuvvet', 'Sürükleme: havanın yavaşlatan direnci', 'Sabit hız ve irtifada kuvvetler dengededir'],
@@ -375,6 +389,16 @@
   X('Yapay Zekâ', 4, 'Günlük Hayatta Yapay Zekâ', ['Telefonlarda sürekli kullanılır', 'Öneri sistemleri izleme geçmişinden öğrenir', 'Hata yapabilir, kontrol et'],
     'Önemli bilgileri yapay zekâya güvenmeden farklı kaynaktan doğrula.',
     table(['UYGULAMA', 'ÖRNEK'], [['Sesli asistan', 'Konuşmayı anlama'], ['Çeviri', 'Anlık metin çevirisi'], ['Öneri', 'Video ve müzik önerisi'], ['Görüntü tanıma', 'Yüz ve nesne bulma'], ['Navigasyon', 'Trafik tahmini']]));
+
+  X('Visual Studio ile Form Uygulaması', 2, 'Form Tasarımı', ['Toolbox’tan kontrol seçip forma sürüklenir', 'Özellikler penceresinden ayarlar değişir', 'F5 ile uygulama çalıştırılır'],
+    'F5, Visual Studio’da uygulamayı hata ayıklama modunda başlatır.',
+    steps(['Yeni proje: Windows Forms App', 'Toolbox’tan Button ve TextBox sürükle', 'Özellikler penceresinden Text değiştir', 'F5 ile çalıştır']));
+  X('Visual Studio ile Form Uygulaması', 3, 'Olay (Event) Yazmak', ['Butona çift tıklayınca Click olayı açılır', 'Olay kodu tıklamada çalışır', 'Kod düzenleyici otomatik tamamlama sunar'],
+    'Tıklama, yazma gibi kullanıcı işlemlerine “olay” denir.',
+    steps(['Butona çift tıkla', 'Click olayının kod bloğu açılır', 'MessageBox.Show("Merhaba") yaz', 'Butona basınca mesaj kutusu çıkar']));
+  X('Visual Studio ile Form Uygulaması', 4, 'Neler Yapılabilir?', ['Not defteri, hesap makinesi, quiz uygulaması', 'Veritabanına kayıt ekleyip okuyabilirsin', 'Form tabanlı basit otomasyonlar yapılır'],
+    'Windows Forms, .NET ile birlikte 2002’de tanıtıldı.',
+    stats([['Form', 'Pencere ve kontroller'], ['Olay', 'Tıklama, yazma'], ['Veri', 'Dosya, veritabanı'], ['F5', 'Çalıştır']]));
 
   // HAVACILIK
   X('Uçuşun Dört Kuvveti', 2, 'Uçak Nasıl Havalanır?', ['Kaldırma hızla artar', 'Kaldırma ağırlığı geçince uçak yükselir', 'Bu yüzden uçaklar pistte hızlanır'],

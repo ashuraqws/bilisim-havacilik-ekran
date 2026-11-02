@@ -95,26 +95,39 @@
       { duration: 1200, easing: 'ease-in-out' });
   }
 
-  // Kontrol: sağ ok tuşu bir sonraki slayta geçer (geçiş sürerken basılan tuş yok sayılır)
-  var curTimer = null, lastAt = 0;
-  document.addEventListener('keydown', function (e) {
-    if (e.key !== 'ArrowRight' || Date.now() - lastAt < TRANS) return;
+  // Kontrol: sağ ok ve sağa kaydırma önceki slayta, sol ok ve sola kaydırma sonraki slayta geçer (geçiş sürerken girdi yok sayılır)
+  var curTimer = null, lastAt = 0, hist = [];
+  function gate(back) {
+    if (Date.now() - lastAt < TRANS || (back && !hist.length)) return;
     clearTimeout(curTimer);
-    next();
+    next(back);
+  }
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowRight') gate(true);
+    else if (e.key === 'ArrowLeft') gate(false);
   });
+  var tx = 0, ty = 0;
+  document.addEventListener('touchstart', function (e) { tx = e.touches[0].clientX; ty = e.touches[0].clientY; }, { passive: true });
+  document.addEventListener('touchend', function (e) {
+    var dx = e.changedTouches[0].clientX - tx, dy = e.changedTouches[0].clientY - ty;
+    if (Math.abs(dx) < 50 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+    gate(dx > 0);
+  }, { passive: true });
 
-  function next() {
+  function next(back) {
     var timer; // hata olsa bile akış devam eder
     try {
-      if (!queue.length) refill();
-      var s = queue.shift();
+      var s;
+      if (back === true) s = hist.pop();
+      else { if (!queue.length) refill(); s = queue.shift(); }
       timer = setTimeout(next, s.video ? 180000 : DWELL); // video: bitince erken geçilir, 3 dk yedek süre
       curTimer = timer; lastAt = Date.now();
       var b = build(s), old = current;
+      if (old && back !== true) { hist.push(old.s); if (hist.length > 50) hist.shift(); }
       stage.dataset.topic = s.topic;
       b.el.style.zIndex = 2;
       host.appendChild(b.el);
-      current = { el: b.el, stop: null };
+      current = { el: b.el, stop: null, s: s };
       try {
         current.stop = b.run && b.run(b.el, function () { if (current && current.el === b.el) { clearTimeout(timer); next(); } });
       } catch (e) { console.error('[v3] run', e); }
@@ -140,7 +153,7 @@
   }
 
   // bg.js (modül) DOMContentLoaded'dan önce çalışır; mount3D hazır olsun diye ilk slayt orada başlar
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', next);
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { next(); });
   else next();
 
   // Her gün 04:00'te sayfa yenilenir (GitHub'daki güncel içerik gelsin).

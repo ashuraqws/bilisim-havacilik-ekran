@@ -5,15 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Bilişim ve Havacılık</title>
 <style>
-@property --ac{syntax:'<color>';inherits:true;initial-value:#35d0ff}
-@property --ac2{syntax:'<color>';inherits:true;initial-value:#7b8cff}
-html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#050914;cursor:none;user-select:none}
+@property --ac{syntax:'<color>';inherits:true;initial-value:#0a72ff}
+@property --ac2{syntax:'<color>';inherits:true;initial-value:#0040ff}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#2c3038;cursor:none;user-select:none}
 *{box-sizing:border-box}
 #stage{position:absolute;left:50%;top:50%;width:1920px;height:1080px;transform-origin:center;overflow:hidden;
-  font-family:'Segoe UI','Inter',system-ui,sans-serif;color:#eaf2ff;background:#050914;
-  --ac:#35d0ff;--ac2:#7b8cff;transition:--ac 1.2s,--ac2 1.2s}
-#stage[data-topic=havacilik]{--ac:#ffb347;--ac2:#ff6b4a}
-#stage[data-topic=atolye]{--ac:#6dffb0;--ac2:#35d0ff}
+  font-family:'Segoe UI','Inter',system-ui,sans-serif;color:#f4f8ff;background:#2c3038;
+  --ac:#0a72ff;--ac2:#0040ff;transition:--ac 1.2s,--ac2 1.2s}
+#stage[data-topic=havacilik]{--ac:#ffdd00;--ac2:#ff9d00}
+#stage[data-topic=atolye]{--ac:#5cf7a0;--ac2:#0a72ff}
 .vslide{display:block;padding:0;background:#000}
 .vslide video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000}
 .vslide .top{z-index:3;text-shadow:0 2px 12px #000}
@@ -39,13 +39,13 @@ li::before{content:"";position:absolute;left:0;top:.5em;width:20px;height:20px;b
 .live h1{animation:h .9s cubic-bezier(.2,.8,.2,1) both}
 @keyframes li{to{opacity:1;transform:none}}
 @keyframes h{from{opacity:0;transform:translateY(40px)}}
-.vis{width:780px;height:780px;border-radius:44px;background:linear-gradient(160deg,rgba(14,24,48,.82),rgba(6,10,24,.7));border:2px solid color-mix(in srgb,var(--ac) 38%,transparent);padding:50px;box-shadow:0 0 90px color-mix(in srgb,var(--ac) 16%,transparent),0 40px 120px rgba(0,0,0,.5)}
+.vis{width:780px;height:780px;border-radius:44px;background:linear-gradient(160deg,rgba(66,72,82,.86),rgba(50,55,64,.78));border:2px solid color-mix(in srgb,var(--ac) 38%,transparent);padding:50px;box-shadow:0 0 90px color-mix(in srgb,var(--ac) 16%,transparent),0 40px 120px rgba(0,0,0,.5)}
 #bg{position:absolute;left:0;top:0;width:1920px;height:1080px}
 #stage.gl .bg i{display:none}
-.bg::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 50% 45%,transparent 45%,rgba(2,5,14,.7) 100%)}
+.bg::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 50% 45%,transparent 45%,rgba(30,33,39,.55) 100%)}
 .vis.v3{background:radial-gradient(circle at 50% 50%,rgba(255,255,255,.035),transparent 70%);box-shadow:none;padding:0}
 .v3d{width:100%;height:100%;position:relative;overflow:hidden;border-radius:44px}
-.lbl{position:absolute;left:0;top:0;font:700 21px 'Segoe UI',system-ui,sans-serif;color:#fff;background:rgba(6,12,28,.8);border-left:3px solid var(--ac);padding:3px 10px;white-space:nowrap;pointer-events:none;will-change:transform,opacity}
+.lbl{position:absolute;left:0;top:0;font:700 21px 'Segoe UI',system-ui,sans-serif;color:#fff;background:rgba(48,53,62,.88);border-left:3px solid var(--ac);padding:3px 10px;white-space:nowrap;pointer-events:none;will-change:transform,opacity}
 .lbl::before{content:"";position:absolute;right:100%;top:50%;width:30px;height:2px;background:var(--ac)}
 .eyebrow{display:flex;align-items:center;gap:22px;margin-bottom:14px;font-size:28px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--ac)}
 .eyebrow .dots{display:flex;gap:10px}
@@ -53,7 +53,7 @@ li::before{content:"";position:absolute;left:0;top:.5em;width:20px;height:20px;b
 .eyebrow .dots i.on{background:var(--ac);opacity:1;box-shadow:0 0 14px var(--ac)}
 .gs .st,.gt .gr,.gc .cd{border-left:6px solid var(--ac)}
 .svg{width:100%;height:100%;overflow:visible}
-.fun{position:absolute;left:110px;right:110px;bottom:34px;font-size:30px;color:rgba(255,255,255,.88);background:rgba(8,14,30,.6);border-left:6px solid var(--ac);border-radius:18px;padding:16px 28px}
+.fun{position:absolute;left:110px;right:110px;bottom:34px;font-size:30px;color:rgba(255,255,255,.92);background:rgba(58,63,72,.82);border-left:6px solid var(--ac);border-radius:18px;padding:16px 28px}
 .fun b{color:var(--ac);letter-spacing:.14em;margin-right:14px}
 #bar{position:absolute;left:0;bottom:0;height:8px;width:0;background:linear-gradient(90deg,var(--ac),var(--ac2));z-index:9}
 @keyframes fill{to{width:100%}}
