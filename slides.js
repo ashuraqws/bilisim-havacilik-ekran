@@ -169,7 +169,7 @@
       '<polygon class="zn z2" points="130,262 300,285 300,355 130,378" style="fill:#2f6aa8;stroke:var(--ac);stroke-width:3"/>' +
       '<rect class="zn z3" x="310" y="285" width="80" height="70" rx="10" style="fill:#ff9d00;stroke:#ffdd00;stroke-width:3"/>' +
       '<polygon class="zn z4" points="400,285 470,262 470,378 400,355" style="fill:#6a5acd;stroke:var(--ac);stroke-width:3"/>' +
-      '<polygon class="zn z4" points="480,272 575,292 575,348 480,368" style="fill:#0040ff;stroke:#ffdd00;stroke-width:3"/>' +
+      '<polygon class="zn z4" points="480,272 575,292 575,348 480,368" style="fill:#0028ff;stroke:#ffdd00;stroke-width:3"/>' +
       lbl(100, '1', 'EMME', 1) + lbl(215, '2', 'SIKIŞTIRMA', 2) + lbl(350, '3', 'YANMA', 3) + lbl(525, '4', 'EGZOZ', 4) +
       T(320, 150, 'TURBOFAN MOTOR KESİTİ', 't" style="font-size:28px')),
       run: function (root) {

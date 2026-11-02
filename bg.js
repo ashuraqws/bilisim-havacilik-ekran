@@ -51,7 +51,7 @@ try {
   window.mount3D = (el, name) => {
     const build = MODELS[name];
     if (!build || !el) return null;
-    const acc = new THREE.Color(stage.dataset.topic === 'havacilik' ? 0xffdd00 : 0x0a72ff);
+    const acc = new THREE.Color(stage.dataset.topic === 'havacilik' ? 0xffdd00 : 0x0060ff);
     const sc = new THREE.Scene();
     sc.environment = envTex;
     const m = build(acc);
@@ -92,14 +92,14 @@ try {
     pos.set([rand(-34, 34), rand(-20, 20), rand(-14, 10)], i * 3);
     vel.push([rand(-0.5, 0.5), rand(-0.5, 0.5), rand(-0.2, 0.2)]);
   }
-  const netPts = pointsMat(0x0a72ff, 0.5);
+  const netPts = pointsMat(0x0060ff, 0.5);
   const pg = new THREE.BufferGeometry();
   pg.setAttribute('position', new THREE.BufferAttribute(pos, 3));
   const MAXL = 500, lp = new Float32Array(MAXL * 6);
   const lg = new THREE.BufferGeometry();
   lg.setAttribute('position', new THREE.BufferAttribute(lp, 3));
   lg.setDrawRange(0, 0);
-  const netLines = lineMat(0x1a7dff);
+  const netLines = lineMat(0x0a6cff);
   const net = new THREE.Group();
   net.add(new THREE.Points(pg, netPts), new THREE.LineSegments(lg, netLines));
   scene.add(net);
