@@ -19,6 +19,7 @@ try {
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.1;
   canvas.addEventListener('webglcontextlost', (e) => e.preventDefault(), false);
+  canvas.addEventListener('webglcontextrestored', () => location.reload(), false);
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(55, W / H, 0.1, 200);
@@ -51,7 +52,8 @@ try {
   window.mount3D = (el, name) => {
     const build = MODELS[name];
     if (!build || !el) return null;
-    const acc = new THREE.Color(getComputedStyle(stage).getPropertyValue('--ac').trim() || '#0a6cff');
+    const tok = stage.dataset.topic === 'havacilik' ? '--hv' : stage.dataset.topic === 'atolye' ? '--gv' : '--bi';
+    const acc = new THREE.Color(getComputedStyle(document.documentElement).getPropertyValue(tok).trim() || '#0a6cff');
     const sc = new THREE.Scene();
     sc.environment = envTex;
     const m = build(acc);
@@ -82,6 +84,7 @@ try {
         if (o.geometry) o.geometry.dispose();
         const mats = o.material ? [].concat(o.material) : [];
         mats.forEach((mt) => mt.dispose());
+        if (o.isInstancedMesh) o.dispose();
       });
     };
   };
@@ -144,8 +147,8 @@ try {
     mixB += (tgtB - mixB) * k; mixA += (tgtA - mixA) * k;
 
     net.visible = mixB > 0.01; air.visible = mixA > 0.01;
-    netPts.opacity = mixB * 0.55; netLines.opacity = mixB * 0.22;
-    streakMat.opacity = mixA * 0.3; dustMat.opacity = mixA * 0.45;
+    netPts.opacity = mixB * 0.55; netLines.opacity = mixB * 0.4;
+    streakMat.opacity = mixA * 0.4; dustMat.opacity = mixA * 0.45;
 
     if (net.visible) {
       for (let i = 0; i < N; i++) {
@@ -160,7 +163,7 @@ try {
       for (let i = 0; i < N && n < MAXL; i++) {
         for (let j = i + 1; j < N && n < MAXL; j++) {
           const dx = pos[i * 3] - pos[j * 3], dy = pos[i * 3 + 1] - pos[j * 3 + 1], dz = pos[i * 3 + 2] - pos[j * 3 + 2];
-          if (dx * dx + dy * dy + dz * dz < 81) { lp.set([pos[i * 3], pos[i * 3 + 1], pos[i * 3 + 2], pos[j * 3], pos[j * 3 + 1], pos[j * 3 + 2]], n * 6); n++; }
+          if (dx * dx + dy * dy + dz * dz < 144) { lp.set([pos[i * 3], pos[i * 3 + 1], pos[i * 3 + 2], pos[j * 3], pos[j * 3 + 1], pos[j * 3 + 2]], n * 6); n++; }
         }
       }
       lg.setDrawRange(0, n * 2);
