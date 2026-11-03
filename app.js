@@ -130,7 +130,7 @@
     try {
       var s;
       if (back === true) s = hist.pop();
-      else if (seen > 0 && seen % 5 === 0 && !clockLast) { s = { clock: true, topic: lastTopic }; clockLast = true; }
+      else if (seen > 0 && seen % 4 === 0 && !clockLast) { s = { clock: true, topic: lastTopic }; clockLast = true; }
       else { if (!queue.length) refill(); s = queue.shift(); clockLast = false; seen++; }
       timer = setTimeout(next, s.clock ? CLOCK_MS : s.video ? 180000 : DWELL); // video: bitince erken geçilir, 3 dk yedek süre
       curTimer = timer; lastAt = Date.now();
