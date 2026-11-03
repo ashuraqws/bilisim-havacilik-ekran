@@ -32,12 +32,12 @@ try {
   g.fillStyle = gr; g.fillRect(0, 0, 64, 64);
   const dot = new THREE.CanvasTexture(c);
 
-  const pointsMat = (color, size) => new THREE.PointsMaterial({ color, size, map: dot, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false });
-  const lineMat = (color) => new THREE.LineBasicMaterial({ color, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false });
+  const pointsMat = (color, size) => new THREE.PointsMaterial({ color, size, map: dot, transparent: true, depthWrite: false, toneMapped: false });
+  const lineMat = (color) => new THREE.LineBasicMaterial({ color, transparent: true, depthWrite: false, toneMapped: false });
 
   /* ---- Panel 3B modelleri: slayttaki .v3d kutusunun üstüne, aynı renderer ile çizilir ---- */
   const envScene = new THREE.Scene();
-  envScene.add(new THREE.Mesh(new THREE.SphereGeometry(50, 32, 16), new THREE.MeshBasicMaterial({ side: THREE.BackSide, color: 0x3a3f48 })));
+  envScene.add(new THREE.Mesh(new THREE.SphereGeometry(50, 32, 16), new THREE.MeshBasicMaterial({ side: THREE.BackSide, color: 0xdde4ed })));
   [[30, 10, [0, 30, 10], 3, 0xffffff], [10, 30, [-30, 5, 5], 2, 0x66ccff], [10, 20, [30, 0, -10], 2, 0xffb070]].forEach(([w, h, p, k, col]) => {
     const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ color: new THREE.Color(col).multiplyScalar(k), side: THREE.DoubleSide }));
     m.position.set(...p); m.lookAt(0, 0, 0); envScene.add(m);
@@ -51,7 +51,7 @@ try {
   window.mount3D = (el, name) => {
     const build = MODELS[name];
     if (!build || !el) return null;
-    const acc = new THREE.Color(stage.dataset.topic === 'havacilik' ? 0xffdd00 : 0x0060ff);
+    const acc = new THREE.Color(getComputedStyle(stage).getPropertyValue('--ac').trim() || '#0a6cff');
     const sc = new THREE.Scene();
     sc.environment = envTex;
     const m = build(acc);
@@ -92,14 +92,14 @@ try {
     pos.set([rand(-34, 34), rand(-20, 20), rand(-14, 10)], i * 3);
     vel.push([rand(-0.5, 0.5), rand(-0.5, 0.5), rand(-0.2, 0.2)]);
   }
-  const netPts = pointsMat(0x0060ff, 0.5);
+  const netPts = pointsMat(0x0f1b2d, 0.5);
   const pg = new THREE.BufferGeometry();
   pg.setAttribute('position', new THREE.BufferAttribute(pos, 3));
   const MAXL = 500, lp = new Float32Array(MAXL * 6);
   const lg = new THREE.BufferGeometry();
   lg.setAttribute('position', new THREE.BufferAttribute(lp, 3));
   lg.setDrawRange(0, 0);
-  const netLines = lineMat(0x0a6cff);
+  const netLines = lineMat(0x0f1b2d);
   const net = new THREE.Group();
   net.add(new THREE.Points(pg, netPts), new THREE.LineSegments(lg, netLines));
   scene.add(net);
@@ -113,12 +113,12 @@ try {
   }
   const sg = new THREE.BufferGeometry();
   sg.setAttribute('position', new THREE.BufferAttribute(sp, 3));
-  const streakMat = lineMat(0xffdd00);
+  const streakMat = lineMat(0x0f1b2d);
   const D = 120, dp = new Float32Array(D * 3);
   for (let i = 0; i < D; i++) dp.set([rand(-40, 40), rand(-22, 22), rand(-14, 8)], i * 3);
   const dg = new THREE.BufferGeometry();
   dg.setAttribute('position', new THREE.BufferAttribute(dp, 3));
-  const dustMat = pointsMat(0xfff0a0, 0.35);
+  const dustMat = pointsMat(0x0f1b2d, 0.35);
   const air = new THREE.Group();
   air.add(new THREE.LineSegments(sg, streakMat), new THREE.Points(dg, dustMat));
   scene.add(air);
@@ -144,8 +144,8 @@ try {
     mixB += (tgtB - mixB) * k; mixA += (tgtA - mixA) * k;
 
     net.visible = mixB > 0.01; air.visible = mixA > 0.01;
-    netPts.opacity = mixB * 0.9; netLines.opacity = mixB * 0.45;
-    streakMat.opacity = mixA * 0.55; dustMat.opacity = mixA * 0.7;
+    netPts.opacity = mixB * 0.55; netLines.opacity = mixB * 0.22;
+    streakMat.opacity = mixA * 0.3; dustMat.opacity = mixA * 0.45;
 
     if (net.visible) {
       for (let i = 0; i < N; i++) {
