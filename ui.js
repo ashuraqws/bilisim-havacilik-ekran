@@ -1,38 +1,57 @@
-/* Üst menü (fare üst kenara gelince açılır) ve renk ayarları. Tercih localStorage'da {bg,bi,hv} olarak tutulur. */
+/* Üst menü (fare üst kenara gelince açılır) ve renk ayarları. Tercih localStorage'da { değişken: renk } olarak tutulur. */
 (function () {
   var KEY = 'v5theme';
-  var DEF = { bg: '#eef2f7', bi: '#0a6cff', hv: '#ffd000' };
-  var root = document.documentElement, body = document.body, menu = document.getElementById('menu');
-  var gear = document.getElementById('gear');
-  var inputs = { bg: document.getElementById('c-bg'), bi: document.getElementById('c-bi'), hv: document.getElementById('c-hv') };
+  var TOKENS = [
+    ['--bg', 'Arka plan', '#eef2f7'],
+    ['--panel', 'Kart ve panel', '#ffffff'],
+    ['--menu', 'Üst menü ve ayarlar', '#ffffff'],
+    ['--ink', 'Başlık ve metin', '#0f1b2d'],
+    ['--ink2', 'İkincil metin', '#3a4a60'],
+    ['--bi', 'Mavi vurgu (bilişim)', '#0a6cff'],
+    ['--hv', 'Sarı vurgu (havacılık)', '#ffd000'],
+    ['--gv', 'Yeşil vurgu (atölye)', '#1fbf75'],
+    ['--code', 'Kod ve video zemini', '#0c1424'],
+    ['--codeTx', 'Kod yazısı', '#cfe2ff']
+  ];
+  var root = document.documentElement, body = document.body;
+  var burger = document.getElementById('burger'), list = document.getElementById('settings-list');
+  var t = {};
 
   function load() {
-    try { return Object.assign({}, DEF, JSON.parse(localStorage.getItem(KEY) || '{}')); }
-    catch (e) { return Object.assign({}, DEF); }
+    var saved = {};
+    try { saved = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) {}
+    var out = {};
+    TOKENS.forEach(function (d) { out[d[0]] = saved[d[0]] || d[2]; });
+    return out;
   }
-  function save(t) {
+  function save() {
     try { localStorage.setItem(KEY, JSON.stringify(t)); } catch (e) {}
   }
-  function apply(t) {
-    root.style.setProperty('--bg', t.bg);
-    root.style.setProperty('--bi', t.bi);
-    root.style.setProperty('--hv', t.hv);
-    Object.keys(inputs).forEach(function (k) { inputs[k].value = t[k]; });
+  function apply() {
+    Object.keys(t).forEach(function (k) { root.style.setProperty(k, t[k]); });
   }
 
-  var t = load();
-  apply(t);
-  Object.keys(inputs).forEach(function (k) {
-    inputs[k].addEventListener('input', function () {
-      t[k] = inputs[k].value;
-      apply(t);
-      save(t);
+  t = load();
+  apply();
+  TOKENS.forEach(function (d) {
+    var row = document.createElement('label');
+    row.textContent = d[1] + ' ';
+    var input = document.createElement('input');
+    input.type = 'color';
+    input.value = t[d[0]];
+    input.addEventListener('input', function () {
+      t[d[0]] = input.value;
+      root.style.setProperty(d[0], input.value);
+      save();
     });
+    row.appendChild(input);
+    list.appendChild(row);
   });
   document.getElementById('reset').addEventListener('click', function () {
-    t = Object.assign({}, DEF);
-    apply(t);
-    save(t);
+    TOKENS.forEach(function (d) { t[d[0]] = d[2]; });
+    apply();
+    save();
+    Array.prototype.forEach.call(list.querySelectorAll('input'), function (el, i) { el.value = TOKENS[i][2]; });
   });
 
   var hideT = null;
@@ -47,10 +66,10 @@
     if (e.clientY < 40) show();
     else if (e.clientY > 120) later();
   });
-  menu.addEventListener('mouseenter', show);
-  menu.addEventListener('mouseleave', later);
+  document.getElementById('menu').addEventListener('mouseenter', show);
+  document.getElementById('menu').addEventListener('mouseleave', later);
 
-  gear.addEventListener('click', function () {
+  burger.addEventListener('click', function () {
     var open = body.classList.toggle('settings-open');
     if (open) show(); else later();
   });
