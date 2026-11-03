@@ -40,7 +40,7 @@ li::before{content:"";position:absolute;left:0;top:.5em;width:20px;height:20px;b
 .live h1{animation:h .9s cubic-bezier(.2,.8,.2,1) both}
 @keyframes li{to{opacity:1;transform:none}}
 @keyframes h{from{opacity:0;transform:translateY(40px)}}
-.vis{width:780px;height:780px;border-radius:44px;background:var(--panel);border:2px solid color-mix(in srgb,var(--ac) 35%,transparent);padding:50px;box-shadow:0 30px 60px rgba(15,27,45,.1)}
+.vis{width:780px;height:780px;border-radius:44px;background:var(--panel);border:2px solid color-mix(in srgb,var(--ac) 35%,transparent);padding:50px}
 #bg{position:absolute;left:0;top:0;width:1920px;height:1080px}
 #stage.gl .bg i{display:none}
 .bg::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 50% 45%,transparent 55%,rgba(15,27,45,.06) 100%)}
@@ -54,7 +54,7 @@ li::before{content:"";position:absolute;left:0;top:.5em;width:20px;height:20px;b
 .eyebrow .dots i.on{background:var(--ac);opacity:1}
 .gs .st,.gt .gr,.gc .cd{border-left:6px solid var(--ac)}
 .svg{width:100%;height:100%;overflow:visible}
-.fun{position:absolute;left:110px;right:110px;bottom:34px;font-size:30px;color:var(--ink);background:var(--panel);border-left:6px solid var(--ac);border-radius:18px;padding:16px 28px;box-shadow:0 10px 30px rgba(15,27,45,.08)}
+.fun{position:absolute;left:110px;right:110px;bottom:34px;font-size:32px;line-height:1.3;box-sizing:border-box;overflow-wrap:anywhere;color:var(--ink);background:var(--panel);border-left:6px solid var(--ac);border-radius:18px;padding:16px 28px}
 .fun b{color:color-mix(in srgb,var(--ac) 70%,var(--ink));letter-spacing:.14em;margin-right:14px}
 #bar{position:absolute;left:0;bottom:0;height:8px;width:0;background:linear-gradient(90deg,var(--ac),var(--ac2));z-index:9}
 @keyframes fill{to{width:100%}}

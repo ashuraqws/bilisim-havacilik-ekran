@@ -1,6 +1,6 @@
 /* Üst menü (fare üst kenara gelince açılır, isteğe bağlı sabit), hazır temalar ve renk ayarları. Tercih localStorage'da tutulur. */
 (function () {
-  var KEY = 'v5theme', PIN_KEY = 'v5pin', PRESET_KEY = 'v5preset';
+  var KEY = 'v5theme', PIN_KEY = 'v5pin', PRESET_KEY = 'v5preset', VER_KEY = 'v5theme_v', VER = '2';
   var TOKENS = [
     ['--bg', 'Arka plan (bilişim)', '#eef2f7'],
     ['--panel', 'Kart ve panel', '#ffffff'],
@@ -27,7 +27,13 @@
   var t = {}, inputs = {}, presetName = 'Varsayılan';
 
   function save() {
-    try { localStorage.setItem(KEY, JSON.stringify(t)); localStorage.setItem(PRESET_KEY, presetName); } catch (e) {}
+    var diff = {};
+    TOKENS.forEach(function (d) { if (t[d[0]] !== DEF[d[0]]) diff[d[0]] = t[d[0]]; });
+    try {
+      localStorage.setItem(KEY, JSON.stringify(diff));
+      localStorage.setItem(PRESET_KEY, presetName);
+      localStorage.setItem(VER_KEY, VER);
+    } catch (e) {}
   }
   function apply() {
     Object.keys(t).forEach(function (k) { root.style.setProperty(k, t[k]); });
@@ -41,8 +47,14 @@
   }
 
   var saved = {};
-  try { saved = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) {}
-  try { presetName = localStorage.getItem(PRESET_KEY) || 'Varsayılan'; } catch (e) {}
+  try {
+    if (localStorage.getItem(VER_KEY) === VER) {
+      saved = JSON.parse(localStorage.getItem(KEY) || '{}');
+      presetName = localStorage.getItem(PRESET_KEY) || 'Varsayılan';
+    } else {
+      localStorage.removeItem(KEY); localStorage.removeItem(PRESET_KEY); // eski sürüm kaydı: sıfırla
+    }
+  } catch (e) {}
   if (!PRESETS[presetName]) presetName = 'Varsayılan';
   t = Object.assign({}, DEF, PRESETS[presetName]);
   TOKENS.forEach(function (d) { if (saved[d[0]]) t[d[0]] = saved[d[0]]; });

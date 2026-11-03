@@ -136,7 +136,7 @@ try {
   setTopic();
 
   const clock = new THREE.Clock();
-  let acc = 0, frames = 0, level = 0, curW = W, curH = H;
+  let acc = 0, frames = 0, level = 0, curW = W, curH = H, lastDown = -Infinity;
   const SIZES = [[1920, 1080], [1280, 720], [960, 540]];
 
   renderer.setAnimationLoop(() => {
@@ -221,7 +221,10 @@ try {
 
     acc += dt; frames++;
     if (acc >= 3) {
-      if (frames / acc < 24 && level < SIZES.length - 1) { level++; curW = SIZES[level][0]; curH = SIZES[level][1]; renderer.setSize(curW, curH, false); }
+      const fps = frames / acc;
+      if (fps < 24 && level < SIZES.length - 1) { level++; lastDown = t; curW = SIZES[level][0]; curH = SIZES[level][1]; renderer.setSize(curW, curH, false); }
+      // histerezis: düşürmeden sonra 120 sn yükseltme yok (osilasyonu önler)
+      else if (fps >= 55 && level > 0 && t - lastDown >= 120) { level--; lastDown = t; curW = SIZES[level][0]; curH = SIZES[level][1]; renderer.setSize(curW, curH, false); }
       acc = 0; frames = 0;
     }
   });
