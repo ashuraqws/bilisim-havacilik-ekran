@@ -1,7 +1,7 @@
 /* yayin-v3 — slayt yöneticisi: otomatik akış, çeşitli geçişler, kalıcı çalışma.
    Aynı anda en fazla 2 slayt DOM'da; eski slayt geçiş sonrası temizlenir. */
 (function () {
-  var DWELL = 18000, TRANS = 1300;
+  var DWELL = 18000, TRANS = 1300, CLOCK_MS = 12000;
   var stage = document.getElementById('stage'), host = document.getElementById('slides');
   var sweep = document.getElementById('sweep'), bar = document.getElementById('bar');
   var EASE = 'cubic-bezier(.7,0,.2,1)';
@@ -57,7 +57,18 @@
     queue = [].concat.apply([], gs);
   }
 
+  function clockView() {
+    var n = new Date(), hh = ('0' + n.getHours()).slice(-2), mm = ('0' + n.getMinutes()).slice(-2);
+    var date = n.toLocaleDateString('tr-TR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    var dig = function (c) { return '<span class="fd">' + c + '</span>'; };
+    var el = document.createElement('section');
+    el.className = 'slide clock';
+    el.innerHTML = '<div class="flipclock">' + dig(hh[0]) + dig(hh[1]) + '<b>:</b>' + dig(mm[0]) + dig(mm[1]) + '</div><div class="cdate">' + date + '</div>';
+    return { el: el, run: null };
+  }
+
   function build(s) {
+    if (s.clock) return clockView();
     var el = document.createElement('section');
     el.className = 'slide'; el.dataset.topic = s.topic;
     if (s.video) {
@@ -96,7 +107,7 @@
   }
 
   // Kontrol: sağ ok ve sağa kaydırma önceki slayta, sol ok ve sola kaydırma sonraki slayta geçer (geçiş sürerken girdi yok sayılır)
-  var curTimer = null, lastAt = 0, hist = [];
+  var curTimer = null, lastAt = 0, hist = [], seen = 0, clockLast = false;
   function gate(back) {
     if (Date.now() - lastAt < TRANS || (back && !hist.length)) return;
     clearTimeout(curTimer);
@@ -119,8 +130,9 @@
     try {
       var s;
       if (back === true) s = hist.pop();
-      else { if (!queue.length) refill(); s = queue.shift(); }
-      timer = setTimeout(next, s.video ? 180000 : DWELL); // video: bitince erken geçilir, 3 dk yedek süre
+      else if (seen > 0 && seen % 5 === 0 && !clockLast) { s = { clock: true, topic: lastTopic }; clockLast = true; }
+      else { if (!queue.length) refill(); s = queue.shift(); clockLast = false; seen++; }
+      timer = setTimeout(next, s.clock ? CLOCK_MS : s.video ? 180000 : DWELL); // video: bitince erken geçilir, 3 dk yedek süre
       curTimer = timer; lastAt = Date.now();
       var b = build(s), old = current;
       if (old && back !== true) { hist.push(old.s); if (hist.length > 50) hist.shift(); }
@@ -134,7 +146,7 @@
       lastTopic = s.topic;
       void b.el.offsetWidth;
       b.el.classList.add('live');
-      restartBar(s.video ? 0 : DWELL);
+      restartBar(s.video ? 0 : s.clock ? CLOCK_MS : DWELL);
       if (old) {
         var t = TRANSITIONS[tIdx++ % TRANSITIONS.length];
         old.el.style.zIndex = 1;

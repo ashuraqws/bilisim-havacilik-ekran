@@ -1,63 +1,115 @@
-/* Üst menü (fare üst kenara gelince açılır) ve renk ayarları. Tercih localStorage'da { değişken: renk } olarak tutulur. */
+/* Üst menü (fare üst kenara gelince açılır, isteğe bağlı sabit), hazır temalar ve renk ayarları. Tercih localStorage'da tutulur. */
 (function () {
-  var KEY = 'v5theme';
+  var KEY = 'v5theme', PIN_KEY = 'v5pin', PRESET_KEY = 'v5preset';
   var TOKENS = [
-    ['--bg', 'Arka plan', '#eef2f7'],
+    ['--bg', 'Arka plan (bilişim)', '#eef2f7'],
     ['--panel', 'Kart ve panel', '#ffffff'],
     ['--menu', 'Üst menü ve ayarlar', '#ffffff'],
-    ['--ink', 'Başlık ve metin', '#0f1b2d'],
-    ['--ink2', 'İkincil metin', '#3a4a60'],
+    ['--ink', 'Başlık ve metin (bilişim)', '#0f1b2d'],
+    ['--ink2', 'İkincil metin (bilişim)', '#3a4a60'],
     ['--bi', 'Mavi vurgu (bilişim)', '#0a6cff'],
     ['--hv', 'Sarı vurgu (havacılık)', '#ffd000'],
+    ['--hvbg', 'Zemin (havacılık)', '#f6eedf'],
+    ['--hvink', 'Başlık ve metin (havacılık)', '#1d3d33'],
     ['--gv', 'Yeşil vurgu (atölye)', '#1fbf75'],
     ['--code', 'Kod ve video zemini', '#0c1424'],
     ['--codeTx', 'Kod yazısı', '#cfe2ff']
   ];
+  var DEF = {};
+  TOKENS.forEach(function (d) { DEF[d[0]] = d[2]; });
+  var PRESETS = {
+    'Varsayılan': {},
+    'Hoca: havacılık krem': { '--hv': '#d9822b', '--hvbg': '#f6eedf', '--hvink': '#1d3d33', '--panel': '#fbf7ee' }
+  };
   var root = document.documentElement, body = document.body;
   var burger = document.getElementById('burger'), list = document.getElementById('settings-list');
-  var t = {};
+  var pin = document.getElementById('pin');
+  var t = {}, inputs = {}, presetName = 'Varsayılan';
 
-  function load() {
-    var saved = {};
-    try { saved = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) {}
-    var out = {};
-    TOKENS.forEach(function (d) { out[d[0]] = saved[d[0]] || d[2]; });
-    return out;
-  }
   function save() {
-    try { localStorage.setItem(KEY, JSON.stringify(t)); } catch (e) {}
+    try { localStorage.setItem(KEY, JSON.stringify(t)); localStorage.setItem(PRESET_KEY, presetName); } catch (e) {}
   }
   function apply() {
     Object.keys(t).forEach(function (k) { root.style.setProperty(k, t[k]); });
+    Object.keys(inputs).forEach(function (k) { inputs[k].value = t[k]; });
   }
-
-  t = load();
-  apply();
-  TOKENS.forEach(function (d) {
-    var row = document.createElement('label');
-    row.textContent = d[1] + ' ';
-    var input = document.createElement('input');
-    input.type = 'color';
-    input.value = t[d[0]];
-    input.addEventListener('input', function () {
-      t[d[0]] = input.value;
-      root.style.setProperty(d[0], input.value);
-      save();
-    });
-    row.appendChild(input);
-    list.appendChild(row);
-  });
-  document.getElementById('reset').addEventListener('click', function () {
-    TOKENS.forEach(function (d) { t[d[0]] = d[2]; });
+  function usePreset(name) {
+    presetName = name;
+    t = Object.assign({}, DEF, PRESETS[name]);
     apply();
     save();
-    Array.prototype.forEach.call(list.querySelectorAll('input'), function (el, i) { el.value = TOKENS[i][2]; });
+  }
+
+  var saved = {};
+  try { saved = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) {}
+  try { presetName = localStorage.getItem(PRESET_KEY) || 'Varsayılan'; } catch (e) {}
+  if (!PRESETS[presetName]) presetName = 'Varsayılan';
+  t = Object.assign({}, DEF, PRESETS[presetName]);
+  TOKENS.forEach(function (d) { if (saved[d[0]]) t[d[0]] = saved[d[0]]; });
+  apply();
+
+  var sel = document.createElement('select');
+  sel.id = 'preset';
+  Object.keys(PRESETS).forEach(function (name) {
+    var o = document.createElement('option');
+    o.value = name;
+    o.textContent = name;
+    sel.appendChild(o);
+  });
+  sel.value = presetName;
+  var selRow = document.createElement('label');
+  selRow.textContent = 'Hazır tema ';
+  selRow.appendChild(sel);
+  list.appendChild(selRow);
+  sel.addEventListener('change', function () { usePreset(sel.value); });
+
+  var GROUPS = [
+    ['Bilişim', ['--bg', '--ink', '--ink2', '--bi']],
+    ['Havacılık', ['--hvbg', '--hvink', '--hv']],
+    ['Ortak', ['--panel', '--menu', '--gv', '--code', '--codeTx']]
+  ];
+  GROUPS.forEach(function (g) {
+    var h = document.createElement('h4');
+    h.textContent = g[0];
+    list.appendChild(h);
+    g[1].forEach(function (k) {
+      var d = TOKENS.filter(function (x) { return x[0] === k; })[0];
+      var row = document.createElement('label');
+      row.textContent = d[1] + ' ';
+      var input = document.createElement('input');
+      input.type = 'color';
+      input.value = t[k];
+      inputs[k] = input;
+      input.addEventListener('input', function () {
+        t[k] = input.value;
+        root.style.setProperty(k, input.value);
+        sel.value = 'Varsayılan';
+        presetName = 'Varsayılan';
+        save();
+      });
+      row.appendChild(input);
+      list.appendChild(row);
+    });
+  });
+  document.getElementById('reset').addEventListener('click', function () {
+    sel.value = 'Varsayılan';
+    usePreset('Varsayılan');
+  });
+
+  var pinned = false;
+  try { pinned = localStorage.getItem(PIN_KEY) === '1'; } catch (e) {}
+  pin.checked = pinned;
+  body.classList.toggle('menu-pinned', pinned);
+  pin.addEventListener('change', function () {
+    pinned = pin.checked;
+    body.classList.toggle('menu-pinned', pinned);
+    try { localStorage.setItem(PIN_KEY, pinned ? '1' : '0'); } catch (e) {}
   });
 
   var hideT = null;
   function show() { clearTimeout(hideT); body.classList.add('menu-open'); }
   function hide() {
-    if (body.classList.contains('settings-open')) return;
+    if (pinned || body.classList.contains('settings-open')) return;
     body.classList.remove('menu-open');
   }
   function later() { clearTimeout(hideT); hideT = setTimeout(hide, 300); }

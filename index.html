@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Bilişim ve Havacılık</title>
 <style>
-:root{--bg:#eef2f7;--bi:#0a6cff;--hv:#ffd000;--gv:#1fbf75;--ink:#0f1b2d;--ink2:#3a4a60;--panel:#ffffff;--menu:#ffffff;--code:#0c1424;--codeTx:#cfe2ff;--line:color-mix(in srgb,var(--ink) 12%,transparent);--bi2:color-mix(in srgb,var(--bi) 70%,#000);--hv2:color-mix(in srgb,var(--hv) 70%,#000)}
+:root{--bg:#eef2f7;--bi:#0a6cff;--hv:#ffd000;--hvbg:#f6eedf;--hvink:#1d3d33;--gv:#1fbf75;--ink:#0f1b2d;--ink2:#3a4a60;--panel:#ffffff;--menu:#ffffff;--code:#0c1424;--codeTx:#cfe2ff;--line:color-mix(in srgb,var(--ink) 12%,transparent);--bi2:color-mix(in srgb,var(--bi) 70%,#000);--hv2:color-mix(in srgb,var(--hv) 70%,#000)}
 @property --ac{syntax:'<color>';inherits:true;initial-value:#0a6cff}
 @property --ac2{syntax:'<color>';inherits:true;initial-value:#0a4fc4}
 html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);cursor:none;user-select:none}
@@ -13,7 +13,7 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);c
 #stage{position:absolute;left:50%;top:50%;width:1920px;height:1080px;transform-origin:center;overflow:hidden;
   font-family:'Segoe UI','Inter',system-ui,sans-serif;color:var(--ink);background:var(--bg);
   --ac:var(--bi);--ac2:var(--bi2);transition:--ac 1.2s,--ac2 1.2s}
-#stage[data-topic=havacilik]{--ac:var(--hv);--ac2:var(--hv2)}
+#stage[data-topic=havacilik]{--ac:var(--hv);--ac2:var(--hv2);background:var(--hvbg);--ink:var(--hvink);--ink2:color-mix(in srgb,var(--hvink) 75%,#ffffff)}
 #stage[data-topic=atolye]{--ac:var(--gv);--ac2:var(--bi)}
 .vslide{display:block;padding:0;background:var(--code)}
 .vslide video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:var(--code)}
@@ -119,13 +119,20 @@ li::before{content:"";position:absolute;left:0;top:.5em;width:20px;height:20px;b
 .live .st,.live .gr{animation-name:rise}
 .live .cd{animation-name:rise}
 @keyframes rise{from{opacity:0;transform:translateY(30px)}}
+.clock{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:56px;padding:0}
+.flipclock{display:flex;align-items:center;gap:18px}
+.fd{position:relative;display:inline-block;width:190px;height:260px;line-height:260px;text-align:center;font:800 210px/260px 'Segoe UI',system-ui,sans-serif;color:var(--ink);background:var(--panel);border-radius:22px;border:2px solid var(--line);overflow:hidden;animation:flip .8s ease both}
+.fd::after{content:"";position:absolute;left:0;right:0;top:50%;height:3px;background:var(--line)}
+.flipclock b{font:800 180px/260px 'Segoe UI',system-ui,sans-serif;color:var(--ac)}
+.cdate{font:700 52px 'Segoe UI',system-ui,sans-serif;color:var(--ink2);letter-spacing:.04em}
+@keyframes flip{from{transform:rotateX(-90deg);opacity:0}to{transform:none;opacity:1}}
 .arr{animation:arr 2s ease-in-out infinite}
 @keyframes arr{50%{opacity:.45}}
 
 #menu{position:fixed;left:0;right:0;top:0;height:64px;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:0 28px;
   background:color-mix(in srgb,var(--menu) 94%,transparent);box-shadow:0 8px 24px rgba(15,27,45,.12);transform:translateY(-100%);transition:transform .35s ease;cursor:default;
   font:600 22px 'Segoe UI',system-ui,sans-serif;color:var(--ink)}
-body.menu-open #menu{transform:none}
+body.menu-open #menu,body.menu-pinned #menu{transform:none}
 #burger{width:52px;height:52px;padding:12px 11px;border:2px solid var(--line);border-radius:12px;background:var(--panel);display:flex;flex-direction:column;justify-content:space-between;cursor:pointer}
 #burger span{display:block;height:4px;border-radius:2px;background:var(--ink)}
 #settings{position:absolute;right:28px;top:72px;width:400px;padding:22px;border-radius:18px;background:var(--menu);box-shadow:0 20px 50px rgba(15,27,45,.18);display:none;max-height:calc(100vh - 100px);overflow:auto}
@@ -143,6 +150,7 @@ body.settings-open #settings{display:block}
   <div id="settings">
     <h3>Renkler</h3>
     <div id="settings-list"></div>
+    <label>Menü her zaman görünsün <input type="checkbox" id="pin"></label>
     <button id="reset" type="button" class="reset">Varsayılana dön</button>
   </div>
 </div>
