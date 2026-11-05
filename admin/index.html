@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Yayın Paneli</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body>
+<a class="skip" href="#main">İçeriğe geç</a>
+
+<div id="mockNote" class="mock-note" hidden>Deneme modu: veriler yalnız bu tarayıcıda saklanır, gerçek yayına gitmez.</div>
+
+<!-- Giriş -->
+<main id="login" class="login" hidden>
+  <div class="login-box">
+    <p class="brand"><span class="brand-mark" aria-hidden="true"></span>Bilişim ve Havacılık</p>
+    <h1>Yayın paneli</h1>
+    <p class="lead">Koridor ekranındaki videoları buradan yönetirsin. Yetkili e-posta adresini yaz, sana giriş bağlantısı gönderelim.</p>
+    <form id="loginForm" novalidate>
+      <label for="loginEmail">E-posta adresi</label>
+      <input id="loginEmail" name="email" type="email" autocomplete="email" spellcheck="false" required placeholder="ad.soyad@okul.k12.tr">
+      <button type="submit" class="btn primary">Giriş bağlantısı gönder</button>
+      <p id="loginMsg" class="form-msg" role="status" aria-live="polite"></p>
+      <p id="loginHint" class="hint" hidden></p>
+    </form>
+  </div>
+</main>
+
+<!-- Panel -->
+<div id="app" hidden>
+  <header class="topbar">
+    <p class="brand"><span class="brand-mark" aria-hidden="true"></span>Yayın paneli</p>
+    <div class="who">
+      <span id="whoEmail"></span>
+      <button id="signOut" type="button" class="btn ghost small">Çıkış</button>
+    </div>
+  </header>
+
+  <main id="main" class="layout" tabindex="-1">
+    <div class="col-main">
+      <section class="panel" aria-labelledby="todayTitle">
+        <div class="panel-head">
+          <h2 id="todayTitle">Bugünün yayın şeridi</h2>
+          <p id="clock" class="clock"></p>
+        </div>
+        <div class="strip-wrap"><ul id="strip" class="strip"></ul><span id="nowLine" class="now-line" aria-hidden="true"></span></div>
+        <div class="ruler" aria-hidden="true"><span>00</span><span>06</span><span>12</span><span>18</span><span>24</span></div>
+      </section>
+
+      <section aria-labelledby="liveTitle">
+        <h2 id="liveTitle" class="sec-title">Şu an yayında <span id="liveCount" class="count"></span></h2>
+        <div id="live" class="live"></div>
+      </section>
+
+      <section class="panel" aria-labelledby="queueTitle">
+        <h2 id="queueTitle">Sırada bekleyenler <span id="queueCount" class="count"></span></h2>
+        <ul id="queue" class="rows"></ul>
+      </section>
+
+      <section class="panel" aria-labelledby="doneTitle">
+        <h2 id="doneTitle">Süresi bitenler <span id="doneCount" class="count"></span></h2>
+        <ul id="done" class="rows"></ul>
+      </section>
+    </div>
+
+    <aside class="col-side">
+      <section class="panel" aria-labelledby="addTitle">
+        <h2 id="addTitle">Yeni video ekle</h2>
+        <form id="addForm" novalidate>
+          <label class="drop" id="drop">
+            <input id="file" type="file" accept="video/*" class="vh">
+            <svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true"><path d="M12 16V4m0 0-4.5 4.5M12 4l4.5 4.5M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span id="dropText"><b>Videoyu buraya sürükle</b> ya da seçmek için tıkla</span>
+            <span id="dropLimit" class="hint"></span>
+          </label>
+
+          <label for="title">Başlık</label>
+          <input id="title" type="text" required maxlength="80" placeholder="Örn. Bilişim haftası duyurusu">
+
+          <fieldset>
+            <legend>Hangi günler arasında?</legend>
+            <div class="pair">
+              <div><label for="startDate">Başlangıç</label><input id="startDate" type="date" required></div>
+              <div><label for="endDate">Bitiş (dahil)</label><input id="endDate" type="date" required></div>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Günün hangi saatlerinde?</legend>
+            <div class="pair">
+              <div><label for="dailyFrom">Başlar</label><input id="dailyFrom" type="time" required value="08:00"></div>
+              <div><label for="dailyTo">Biter</label><input id="dailyTo" type="time" required value="17:00"></div>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Hafta günleri <span class="hint">(hiçbiri seçili değilse her gün)</span></legend>
+            <div id="days" class="days"></div>
+          </fieldset>
+
+          <label for="everyN">Kaç slaytta bir oynasın?</label>
+          <div class="every">
+            <input id="everyN" type="number" min="2" max="50" step="1" value="10" required>
+            <span class="hint">slaytta bir kez</span>
+          </div>
+
+          <div id="progress" class="progress" hidden><span></span></div>
+          <p id="addMsg" class="form-msg" role="status" aria-live="polite"></p>
+          <button id="addBtn" type="submit" class="btn primary wide">Yükle ve yayına ekle</button>
+        </form>
+      </section>
+
+      <section class="panel" aria-labelledby="usersTitle">
+        <h2 id="usersTitle">Yetkili kişiler <span id="usersCount" class="count"></span></h2>
+        <ul id="users" class="users"></ul>
+        <form id="userForm" class="user-form" novalidate>
+          <label for="userEmail" class="vh">Yeni yetkili e-postası</label>
+          <input id="userEmail" type="email" placeholder="yeni.kisi@okul.k12.tr" autocomplete="off" spellcheck="false">
+          <button type="submit" class="btn">Ekle</button>
+        </form>
+        <p id="userMsg" class="form-msg" role="status" aria-live="polite"></p>
+      </section>
+    </aside>
+  </main>
+</div>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script src="../config.js"></script>
+<script src="../schedule.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="mock-api.js"></script>
+<script src="supabase-api.js"></script>
+<script src="api.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>

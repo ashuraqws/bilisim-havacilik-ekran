@@ -107,7 +107,7 @@
   }
 
   // Kontrol: sağ ok ve sağa kaydırma önceki slayta, sol ok ve sola kaydırma sonraki slayta geçer (geçiş sürerken girdi yok sayılır)
-  var curTimer = null, lastAt = 0, hist = [], seen = 0, clockLast = false;
+  var curTimer = null, lastAt = 0, hist = [], seen = 0, clockLast = false, sinceVideo = 0;
   function gate(back) {
     if (Date.now() - lastAt < TRANS || (back && !hist.length)) return;
     clearTimeout(curTimer);
@@ -128,10 +128,14 @@
   function next(back) {
     var timer; // hata olsa bile akış devam eder
     try {
-      var s;
+      var s, rv;
       if (back === true) s = hist.pop();
+      else if (window.RemoteVideos && (rv = window.RemoteVideos.next()) && sinceVideo >= rv.every_n) { // yönetim panelinden gelen video
+        s = { video: rv.video, title: String(rv.title).replace(/[&<>"]/g, function (c) { return '&#' + c.charCodeAt(0) + ';'; }), topic: lastTopic };
+        window.RemoteVideos.lastId = rv.id; sinceVideo = 0;
+      }
       else if (seen > 0 && seen % 4 === 0 && !clockLast) { s = { clock: true, topic: lastTopic }; clockLast = true; }
-      else { if (!queue.length) refill(); s = queue.shift(); clockLast = false; seen++; }
+      else { if (!queue.length) refill(); s = queue.shift(); clockLast = false; seen++; sinceVideo++; }
       timer = setTimeout(next, s.clock ? CLOCK_MS : s.video ? 180000 : DWELL); // video: bitince erken geçilir, 3 dk yedek süre
       curTimer = timer; lastAt = Date.now();
       var b = build(s), old = current;
@@ -165,6 +169,7 @@
   }
 
   // bg.js (modül) DOMContentLoaded'dan önce çalışır; mount3D hazır olsun diye ilk slayt orada başlar
+  if (window.RemoteVideos) window.RemoteVideos.start();
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { next(); });
   else next();
 
