@@ -4,130 +4,215 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
-<title>Yayın Paneli</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap">
+<meta name="theme-color" content="#ffffff">
+<title>Yayın paneli</title>
 <link rel="stylesheet" href="admin.css">
 </head>
 <body>
 <a class="skip" href="#main">İçeriğe geç</a>
 
-<div id="mockNote" class="mock-note" hidden>Deneme modu: veriler yalnız bu tarayıcıda saklanır, gerçek yayına gitmez.</div>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-screen" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/><path d="m10.5 8 3.5 2-3.5 2z"/></symbol>
+    <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 15V4m0 0L7.5 8.5M12 4l4.5 4.5"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></symbol>
+    <symbol id="i-film" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m10 9 5 3-5 3z"/></symbol>
+    <symbol id="i-pause" viewBox="0 0 24 24"><path d="M9 6v12M15 6v12"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="m8 5 11 7-11 7z"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M8 3v4M16 3v4M3.5 10h17"/></symbol>
+    <symbol id="i-calplus" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M8 3v4M16 3v4M3.5 10h17M12 13v5M9.5 15.5h5"/></symbol>
+    <symbol id="i-repeat" viewBox="0 0 24 24"><path d="M4 12a8 8 0 0 1 14-5.3L20 9"/><path d="M20 4v5h-5"/><path d="M20 12a8 8 0 0 1-14 5.3L4 15"/><path d="M4 20v-5h5"/></symbol>
+    <symbol id="i-layers" viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5z"/><path d="m3 13 9 5 9-5"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-out" viewBox="0 0 24 24"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3"/><path d="M10 16l-4-4 4-4M6 12h10"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+    <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 6.5 8.5 6.5 8.5-6.5"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+  </defs>
+</svg>
 
-<!-- Giriş -->
+<div id="demo" class="demo" hidden>
+  <svg class="ic" aria-hidden="true"><use href="#i-info"/></svg>
+  <span>Demo modu: veriler bu tarayıcıda. Kioska hiçbir şey gitmez.</span>
+</div>
+
 <main id="login" class="login" hidden>
   <div class="login-box">
-    <p class="brand"><span class="brand-mark" aria-hidden="true"></span>Bilişim ve Havacılık</p>
-    <h1>Yayın paneli</h1>
-    <p class="lead">Koridor ekranındaki videoları buradan yönetirsin. Yetkili e-posta adresini yaz, sana giriş bağlantısı gönderelim.</p>
-    <form id="loginForm" novalidate>
+    <div class="brand">
+      <span class="mark"><svg class="ic" aria-hidden="true"><use href="#i-screen"/></svg></span>
+      <span><b>Bilişim ve Havacılık</b><small>Koridor ekranı</small></span>
+    </div>
+    <h1>Yayın paneline giriş</h1>
+    <p class="lead">Koridor ekranında dönen videoları buradan eklersin. Yetkili e-posta adresini yaz, giriş bağlantısını gönderelim.</p>
+    <form id="loginForm" class="login-card" novalidate>
       <label for="loginEmail">E-posta adresi</label>
-      <input id="loginEmail" name="email" type="email" autocomplete="email" spellcheck="false" required placeholder="ad.soyad@okul.k12.tr">
-      <button type="submit" class="btn primary">Giriş bağlantısı gönder</button>
-      <p id="loginMsg" class="form-msg" role="status" aria-live="polite"></p>
-      <p id="loginHint" class="hint" hidden></p>
+      <input id="loginEmail" type="email" autocomplete="email" inputmode="email" spellcheck="false" required placeholder="ad.soyad@okul.k12.tr" aria-describedby="loginErr">
+      <p id="loginErr" class="err" aria-live="polite"></p>
+      <button id="loginBtn" type="submit" class="btn primary wide"><svg class="ic" aria-hidden="true"><use href="#i-mail"/></svg><span>Giriş bağlantısı gönder</span></button>
+      <div id="loginStatus" class="status" role="status" aria-live="polite"></div>
     </form>
   </div>
 </main>
 
-<!-- Panel -->
 <div id="app" hidden>
   <header class="topbar">
-    <p class="brand"><span class="brand-mark" aria-hidden="true"></span>Yayın paneli</p>
-    <div class="who">
-      <span id="whoEmail"></span>
-      <button id="signOut" type="button" class="btn ghost small">Çıkış</button>
+    <div class="topbar-in">
+      <div class="brand">
+        <span class="mark"><svg class="ic" aria-hidden="true"><use href="#i-screen"/></svg></span>
+        <span><b>Yayın paneli</b><small>Bilişim ve Havacılık koridor ekranı</small></span>
+      </div>
+      <div class="who">
+        <span id="whoMail" class="who-mail"></span>
+        <button id="signOut" type="button" class="btn sm"><svg class="ic" aria-hidden="true"><use href="#i-out"/></svg><span>Çıkış</span></button>
+      </div>
     </div>
   </header>
 
-  <main id="main" class="layout" tabindex="-1">
-    <div class="col-main">
-      <section class="panel" aria-labelledby="todayTitle">
-        <div class="panel-head">
-          <h2 id="todayTitle">Bugünün yayın şeridi</h2>
-          <p id="clock" class="clock"></p>
-        </div>
-        <div class="strip-wrap"><ul id="strip" class="strip"></ul><span id="nowLine" class="now-line" aria-hidden="true"></span></div>
-        <div class="ruler" aria-hidden="true"><span>00</span><span>06</span><span>12</span><span>18</span><span>24</span></div>
-      </section>
-
-      <section aria-labelledby="liveTitle">
-        <h2 id="liveTitle" class="sec-title">Şu an yayında <span id="liveCount" class="count"></span></h2>
-        <div id="live" class="live"></div>
-      </section>
-
-      <section class="panel" aria-labelledby="queueTitle">
-        <h2 id="queueTitle">Sırada bekleyenler <span id="queueCount" class="count"></span></h2>
-        <ul id="queue" class="rows"></ul>
-      </section>
-
-      <section class="panel" aria-labelledby="doneTitle">
-        <h2 id="doneTitle">Süresi bitenler <span id="doneCount" class="count"></span></h2>
-        <ul id="done" class="rows"></ul>
-      </section>
+  <main id="main" class="wrap" tabindex="-1">
+    <div class="head">
+      <div>
+        <h1>Video yayını</h1>
+        <p id="summary">Videolar yükleniyor.</p>
+      </div>
+      <p id="nowText" class="now"></p>
     </div>
 
-    <aside class="col-side">
-      <section class="panel" aria-labelledby="addTitle">
-        <h2 id="addTitle">Yeni video ekle</h2>
-        <form id="addForm" novalidate>
-          <label class="drop" id="drop">
-            <input id="file" type="file" accept="video/*" class="vh">
-            <svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true"><path d="M12 16V4m0 0-4.5 4.5M12 4l4.5 4.5M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            <span id="dropText"><b>Videoyu buraya sürükle</b> ya da seçmek için tıkla</span>
-            <span id="dropLimit" class="hint"></span>
-          </label>
+    <div id="loadErr" class="oops" role="alert" hidden>
+      <span id="loadErrText"></span>
+      <button id="retry" type="button" class="btn sm">Tekrar dene</button>
+    </div>
 
-          <label for="title">Başlık</label>
-          <input id="title" type="text" required maxlength="80" placeholder="Örn. Bilişim haftası duyurusu">
-
-          <fieldset>
-            <legend>Hangi günler arasında?</legend>
-            <div class="pair">
-              <div><label for="startDate">Başlangıç</label><input id="startDate" type="date" required></div>
-              <div><label for="endDate">Bitiş (dahil)</label><input id="endDate" type="date" required></div>
+    <div class="grid">
+      <div class="col">
+        <section class="panel" aria-labelledby="addTitle">
+          <div class="panel-h"><h2 id="addTitle">Video ekle</h2></div>
+          <form id="addForm" novalidate>
+            <div id="drop" class="drop">
+              <input id="file" type="file" accept="video/*" aria-describedby="fileHelp fileErr" aria-label="Video dosyası seç">
+              <svg class="ic" aria-hidden="true"><use href="#i-upload"/></svg>
+              <span><b>Videoyu buraya bırak</b> ya da seçmek için tıkla</span>
+              <span id="fileHelp" class="help">MP4 önerilir, en fazla <span class="maxmb">50</span> MB. Ses kapalı oynar.</span>
             </div>
-          </fieldset>
-
-          <fieldset>
-            <legend>Günün hangi saatlerinde?</legend>
-            <div class="pair">
-              <div><label for="dailyFrom">Başlar</label><input id="dailyFrom" type="time" required value="08:00"></div>
-              <div><label for="dailyTo">Biter</label><input id="dailyTo" type="time" required value="17:00"></div>
+            <div id="fileBox" class="file" hidden>
+              <video id="fileVid" muted playsinline preload="metadata"></video>
+              <div class="file-meta"><b id="fileName"></b><span id="fileSize"></span></div>
+              <button id="fileClear" type="button" class="btn quiet sm icon" aria-label="Dosyayı kaldır"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button>
             </div>
-          </fieldset>
+            <p id="fileErr" class="err" aria-live="polite"></p>
 
-          <fieldset>
-            <legend>Hafta günleri <span class="hint">(hiçbiri seçili değilse her gün)</span></legend>
-            <div id="days" class="days"></div>
-          </fieldset>
+            <div class="field">
+              <label for="title">Başlık</label>
+              <input id="title" type="text" maxlength="80" required placeholder="Örn. Bilişim haftası duyurusu" aria-describedby="titleErr">
+              <p id="titleErr" class="err" aria-live="polite"></p>
+            </div>
 
-          <label for="everyN">Kaç slaytta bir oynasın?</label>
-          <div class="every">
-            <input id="everyN" type="number" min="2" max="50" step="1" value="10" required>
-            <span class="hint">slaytta bir kez</span>
+            <fieldset>
+              <legend>Yayın tarihleri</legend>
+              <div class="pair">
+                <div><label for="startDate">Başlangıç</label><input id="startDate" type="date" required aria-describedby="dateErr"></div>
+                <div><label for="endDate">Bitiş (dahil)</label><input id="endDate" type="date" required aria-describedby="dateErr"></div>
+              </div>
+              <p id="dateErr" class="err" aria-live="polite"></p>
+            </fieldset>
+
+            <fieldset>
+              <legend>Günlük saat aralığı</legend>
+              <div class="pair">
+                <div><label for="dailyFrom">Başlar</label><input id="dailyFrom" type="time" required value="08:50" aria-describedby="timeErr timeHelp"></div>
+                <div><label for="dailyTo">Biter</label><input id="dailyTo" type="time" required value="16:10" aria-describedby="timeErr timeHelp"></div>
+              </div>
+              <div style="margin-top:10px" aria-hidden="true">
+                <div id="formBand" class="dayband"></div>
+                <div class="ticks"><span>00</span><span>06</span><span>12</span><span>18</span><span>24</span></div>
+              </div>
+              <p id="timeHelp" class="help">Okul saatleri: 08:50–16:10.</p>
+              <p id="timeErr" class="err" aria-live="polite"></p>
+            </fieldset>
+
+            <fieldset>
+              <legend id="daysLbl">Hafta günleri</legend>
+              <div id="days" class="days" role="group" aria-labelledby="daysLbl" aria-describedby="daysErr"></div>
+              <div class="day-presets">
+                <button type="button" class="chip" data-preset="1,2,3,4,5">Hafta içi</button>
+                <button type="button" class="chip" data-preset="1,2,3,4,5,6,7">Her gün</button>
+              </div>
+              <p id="daysErr" class="err" aria-live="polite"></p>
+            </fieldset>
+
+            <div class="field">
+              <label for="everyN">Sıklık</label>
+              <div class="every">
+                <span>Her</span>
+                <input id="everyN" type="number" inputmode="numeric" min="2" max="60" step="1" value="10" required aria-describedby="everyHelp everyErr">
+                <span>slaytta bir</span>
+              </div>
+              <div id="rot" class="rot" aria-hidden="true"></div>
+              <p id="everyHelp" class="help">10 slayt yaklaşık 3 dk.</p>
+              <p id="everyErr" class="err" aria-live="polite"></p>
+            </div>
+
+            <label class="switch" for="enabled">
+              <span>Hemen yayına al<small>Kapalıysa kaydedilir ama gösterilmez.</small></span>
+              <input id="enabled" type="checkbox" role="switch" checked>
+            </label>
+
+            <div id="progress" class="progress" hidden>
+              <div class="bar" role="progressbar" aria-labelledby="progressText" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span></span></div>
+              <p id="progressText">Yükleniyor</p>
+            </div>
+            <p id="formErr" class="err" aria-live="polite"></p>
+            <button id="addBtn" type="submit" class="btn primary wide"><svg class="ic" aria-hidden="true"><use href="#i-upload"/></svg><span>Yükle ve kaydet</span></button>
+          </form>
+        </section>
+
+        <section class="panel" aria-labelledby="peopleTitle">
+          <div class="panel-h">
+            <h2 id="peopleTitle">Yetkili kişiler</h2>
+            <span class="sub" id="peopleCount">0/5</span>
           </div>
+          <ul id="people" class="people"></ul>
+          <form id="personForm" novalidate>
+            <label for="personEmail">Kişi ekle</label>
+            <div class="add-person">
+              <input id="personEmail" type="email" inputmode="email" spellcheck="false" autocomplete="off" placeholder="yeni.kisi@okul.k12.tr" aria-describedby="personErr personHelp">
+              <button id="personBtn" type="submit" class="btn"><svg class="ic" aria-hidden="true"><use href="#i-plus"/></svg><span>Ekle</span></button>
+            </div>
+            <p id="personHelp" class="help">En fazla 5 kişi giriş yapabilir.</p>
+            <p id="personErr" class="err" aria-live="polite"></p>
+          </form>
+        </section>
+      </div>
 
-          <div id="progress" class="progress" hidden><span></span></div>
-          <p id="addMsg" class="form-msg" role="status" aria-live="polite"></p>
-          <button id="addBtn" type="submit" class="btn primary wide">Yükle ve yayına ekle</button>
-        </form>
-      </section>
-
-      <section class="panel" aria-labelledby="usersTitle">
-        <h2 id="usersTitle">Yetkili kişiler <span id="usersCount" class="count"></span></h2>
-        <ul id="users" class="users"></ul>
-        <form id="userForm" class="user-form" novalidate>
-          <label for="userEmail" class="vh">Yeni yetkili e-postası</label>
-          <input id="userEmail" type="email" placeholder="yeni.kisi@okul.k12.tr" autocomplete="off" spellcheck="false">
-          <button type="submit" class="btn">Ekle</button>
-        </form>
-        <p id="userMsg" class="form-msg" role="status" aria-live="polite"></p>
-      </section>
-    </aside>
+      <div class="col">
+        <section class="panel" aria-labelledby="liveTitle">
+          <div class="panel-h"><h2 id="liveTitle">Şu an yayında <span id="liveCount" class="count">0</span></h2></div>
+          <div id="live" class="live"><div class="skel"></div><div class="skel"></div></div>
+        </section>
+        <section class="panel" aria-labelledby="planTitle">
+          <div class="panel-h"><h2 id="planTitle">Planlananlar <span id="planCount" class="count">0</span></h2></div>
+          <ul id="plan" class="rows"></ul>
+        </section>
+        <section class="panel" aria-labelledby="doneTitle">
+          <div class="panel-h"><h2 id="doneTitle">Bitenler <span id="doneCount" class="count">0</span></h2></div>
+          <ul id="done" class="rows"></ul>
+        </section>
+      </div>
+    </div>
   </main>
 </div>
+
+<dialog id="confirm" aria-labelledby="cfTitle" aria-describedby="cfText">
+  <form method="dialog">
+    <h2 id="cfTitle"></h2>
+    <p id="cfText"></p>
+    <div class="dlg-a">
+      <button value="no" class="btn" id="cfNo">Vazgeç</button>
+      <button value="yes" class="btn danger-solid" id="cfYes">Sil</button>
+    </div>
+  </form>
+</dialog>
 
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
