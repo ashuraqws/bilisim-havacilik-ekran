@@ -53,7 +53,8 @@ create table if not exists public.videos (
 alter table public.videos enable row level security;
 
 drop policy if exists videos_public_read on public.videos;
-create policy videos_public_read on public.videos for select to anon, authenticated using (enabled);
+create policy videos_public_read on public.videos for select to anon, authenticated using (enabled and start_date <= (now() at time zone 'Europe/Istanbul')::date
+         and end_date >= (now() at time zone 'Europe/Istanbul')::date - 1); -- -1: gece yarısını aşan pencerenin sabah kısmı
 drop policy if exists videos_admin_all on public.videos;
 create policy videos_admin_all on public.videos for all to authenticated
   using (public.is_allowed()) with check (public.is_allowed());

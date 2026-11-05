@@ -392,7 +392,8 @@
     $('loginStatus').textContent = ''; setErr('loginErr', '', inp);
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setErr('loginErr', 'Geçerli bir e-posta adresi yaz.', inp); inp.focus(); return; }
     var btn = $('loginBtn'); btn.disabled = true; btn.lastChild.textContent = 'Gönderiliyor';
-    API.signIn(email).then(function () {
+    API.signIn(email).then(function (r) {
+      if (r && r.ok === false) { status(r.message, false); return; }
       if (MOCK) return API.getSession().then(function (s) { if (s) showApp(s); });
       status('Bağlantı ' + email + ' adresine gönderildi. E-postandaki bağlantıya tıkla; bu sayfa açılınca giriş yapmış olursun.', true);
     }).catch(function (er) { status(msg(er), false); })
