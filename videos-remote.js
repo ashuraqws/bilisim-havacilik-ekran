@@ -6,7 +6,7 @@
 
   function refresh() {
     return fetch(C.SUPABASE_URL + '/rest/v1/videos?select=id,title,storage_path,start_date,end_date,daily_from,daily_to,weekdays,every_n,enabled&enabled=eq.true', {
-      headers: { apikey: C.SUPABASE_ANON_KEY, Authorization: 'Bearer ' + C.SUPABASE_ANON_KEY }, cache: 'no-store'
+      headers: { apikey: C.SUPABASE_ANON_KEY }, cache: 'no-store' // sb_publishable_ anahtarı JWT değil, Bearer olarak gönderilmez
     }).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
       .then(function (rows) {
         if (!Array.isArray(rows)) throw new Error('liste');
