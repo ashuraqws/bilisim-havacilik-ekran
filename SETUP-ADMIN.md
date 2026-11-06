@@ -2,7 +2,7 @@
 
 1. https://supabase.com adresinde ucretsiz bir proje acin.
 2. **Authentication > Users > Add user**: kullanici adi olarak `pano@pano.local` yazin (panel bu adresi kendisi uretir, kullanici gormez), guclu bir sifre belirleyin ve **Auto Confirm User** secenegini isaretleyin. Olusan kullanicinin UUID'sini kopyalayin.
-3. **Authentication > Sign In / Providers**'da "Allow new users to sign up" secenegini kapatin.
+3. **Authentication > Sign In / Providers**'da "Allow new users to sign up" secenegini kapatin (zorunlu: aksi halde herkes hesap acabilir). **Authentication > Rate Limits**'te sign-in / token / e-posta limitlerini etkin birakin ve varsayilanlardan dusuk tutun.
 4. **SQL Editor**'de `supabase/setup.sql` dosyasinin tamamini calistirin. Sondaki `'UUID_BURAYA'` yerine 2. adimdaki UUID'yi yazip satir basindaki `--` isaretini kaldirin ve o satiri da calistirin.
 5. **Project Settings > API**'den `Project URL` ve `anon public` anahtarini `config.js` icindeki `SUPABASE_URL` ve `SUPABASE_ANON_KEY` alanlarina yazin.
 6. `service_role` anahtarini HICBIR dosyaya yazmayin, paylasmayin.

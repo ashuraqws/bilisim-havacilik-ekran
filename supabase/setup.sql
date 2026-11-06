@@ -41,6 +41,9 @@ alter table public.videos enable row level security;
 drop policy if exists videos_public_read on public.videos;
 create policy videos_public_read on public.videos for select to anon, authenticated using (enabled and start_date <= (now() at time zone 'Europe/Istanbul')::date
          and end_date >= (now() at time zone 'Europe/Istanbul')::date - 1); -- -1: gece yarısını aşan pencerenin sabah kısmı
+-- created_by anon'a kapalı: yalnız kiosk'un okuduğu sütunlar açılır (admin = authenticated etkilenmez)
+revoke select on public.videos from anon;
+grant select (id, title, storage_path, start_date, end_date, daily_from, daily_to, weekdays, every_n, enabled) on public.videos to anon;
 drop policy if exists videos_admin_all on public.videos;
 create policy videos_admin_all on public.videos for all to authenticated
   using (public.is_admin()) with check (public.is_admin());
@@ -51,8 +54,11 @@ values ('videos', 'videos', true, 52428800, array['video/mp4', 'video/webm', 'vi
 on conflict (id) do update set public = true, file_size_limit = 52428800;
 
 drop policy if exists videos_obj_read on storage.objects;
+-- Anon yalnız aktif (videos_public_read'den geçen) bir satırın dosyasını okur, kovayı LİSTELEYEMEZ; yönetici hepsini listeler.
+-- Not: kova public olduğundan, yolu bilinen dosya /object/public/ ile yine indirilir; liste çıkarılamaz.
 create policy videos_obj_read on storage.objects for select to anon, authenticated
-  using (bucket_id = 'videos');
+  using (bucket_id = 'videos' and (public.is_admin()
+    or exists (select 1 from public.videos v where v.storage_path = storage.objects.name)));
 drop policy if exists videos_obj_write on storage.objects;
 create policy videos_obj_write on storage.objects for insert to authenticated
   with check (bucket_id = 'videos' and public.is_admin());

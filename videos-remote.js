@@ -5,7 +5,7 @@
   if (on) { try { list = JSON.parse(localStorage.getItem(KEY)) || []; } catch (e) {} if (!Array.isArray(list)) list = []; } // son iyi liste (çevrimdışı yedek)
 
   function refresh() {
-    return fetch(C.SUPABASE_URL + '/rest/v1/videos?select=*&enabled=eq.true', {
+    return fetch(C.SUPABASE_URL + '/rest/v1/videos?select=id,title,storage_path,start_date,end_date,daily_from,daily_to,weekdays,every_n,enabled&enabled=eq.true', {
       headers: { apikey: C.SUPABASE_ANON_KEY, Authorization: 'Bearer ' + C.SUPABASE_ANON_KEY }, cache: 'no-store'
     }).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
       .then(function (rows) {
