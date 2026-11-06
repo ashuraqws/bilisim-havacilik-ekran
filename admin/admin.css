@@ -87,7 +87,7 @@ input:focus-visible { outline-offset: 0; }
 
 /* Alanlar */
 label, legend { display: block; font-size: 13.5px; font-weight: 600; color: var(--ink2); margin-bottom: 6px; }
-input[type=text], input[type=email], input[type=date], input[type=time], input[type=number] {
+input[type=text], input[type=password], input[type=date], input[type=time], input[type=number] {
   width: 100%; min-height: 42px; padding: 8px 12px;
   border: 1px solid var(--line2); border-radius: var(--r-s); background: var(--panel);
   font-size: 15px; transition: border-color .15s, box-shadow .15s;
@@ -122,7 +122,7 @@ legend { padding: 0; }
 .topbar { background: var(--panel); border-bottom: 1px solid var(--line); }
 .topbar-in { max-width: 1280px; margin: 0 auto; padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
 .who { display: flex; align-items: center; gap: 10px; min-width: 0; }
-.who-mail { font-size: 14px; color: var(--ink2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.who-user { font-size: 14px; color: var(--ink2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 /* Yerleşim */
 .wrap { max-width: 1280px; margin: 0 auto; padding: 28px 24px 64px; }
@@ -241,19 +241,6 @@ legend { padding: 0; }
 .live .empty { grid-column: 1 / -1; }
 .link { background: none; border: 0; padding: 0; color: var(--accent-ink); font-weight: 600; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
 
-/* Yetkili kişiler */
-.people { list-style: none; margin: 0 0 16px; padding: 0; }
-.person { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-top: 1px solid var(--line); }
-.person:first-child { border-top: 0; padding-top: 0; }
-.av { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; font-size: 13.5px; font-weight: 700; flex: none; }
-.person-m { flex: 1; min-width: 0; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.person-m small { display: block; font-size: 12.5px; color: var(--muted); }
-.meter { display: flex; gap: 3px; }
-.meter i { width: 12px; height: 6px; border-radius: 3px; background: var(--line); }
-.meter i.on { background: var(--accent); }
-.add-person { display: flex; gap: 8px; }
-.add-person input { flex: 1; min-width: 0; }
-
 /* Yükleniyor iskeleti */
 .skel { height: 180px; border-radius: var(--r); background: var(--sunk); animation: pulse 1.4s ease-in-out infinite; }
 @keyframes pulse { 50% { opacity: .55; } }
@@ -285,7 +272,7 @@ dialog p { color: var(--ink2); font-size: 14.5px; overflow-wrap: anywhere; }
 @media (max-width: 560px) {
   .topbar-in { padding: 10px 16px; }
   .topbar .brand small { display: none; }
-  .who-mail { max-width: 40vw; font-size: 13px; }
+  .who-user { max-width: 40vw; font-size: 13px; }
   .wrap { padding: 20px 16px 48px; }
   h1 { font-size: 23px; }
   .panel { padding: 16px; }

@@ -5,8 +5,12 @@
   if (!C.SUPABASE_URL || !window.supabase) return; // yapılandırılmamış: api.js MockApi'yi seçer
   var db = window.supabase.createClient(C.SUPABASE_URL, C.SUPABASE_ANON_KEY);
 
+  // Panelde yalnız kullanıcı adı girilir. Supabase Auth bir adres ister; o adres dahili olarak türetilir.
+  var SUFFIX = '@pano.local';
+  function toAuth(username) { return String(username || '').trim().toLowerCase() + SUFFIX; }
+  function fromAuth(addr) { return String(addr).replace(SUFFIX, ''); }
+
   function fail(error, msg) { if (error) throw new Error(msg || error.message); }
-  function clean(email) { return String(email || '').trim().toLowerCase(); }
 
   // Dosya adı güvenli ve benzersiz olsun
   function pathFor(file) {
@@ -36,18 +40,14 @@
     getSession: function () {
       return db.auth.getSession().then(function (r) {
         var u = r.data && r.data.session && r.data.session.user;
-        return u && u.email ? { email: u.email } : null;
+        return u && u.email ? { username: fromAuth(u.email) } : null;
       });
     },
-    signIn: function (email) {
-      email = clean(email);
-      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return Promise.resolve({ ok: false, message: 'Geçerli bir e-posta adresi yazın.' });
-      // yetki girişte değil allowed_users tablosunda (RLS) denetlenir
-      return db.auth.signInWithOtp({ email: email, options: { shouldCreateUser: true, emailRedirectTo: location.origin + location.pathname } })
-        .then(function (r) {
-          return r.error ? { ok: false, message: 'Bağlantı gönderilemedi: ' + r.error.message }
-            : { ok: true, message: 'Giriş bağlantısı e-postanıza gönderildi.' };
-        });
+    signIn: function (username, password) {
+      if (!/^[^@\s]+$/.test(String(username || '').trim())) return Promise.resolve({ ok: false, message: 'Kullanıcı adı ve şifreyi yaz.' });
+      // Yetki RLS'te denetlenir: yalnız bu Auth kullanıcısının yazma hakkı var (supabase/setup.sql)
+      return db.auth.signInWithPassword({ email: toAuth(username), password: password })
+        .then(function (r) { return r.error ? { ok: false, message: 'Kullanıcı adı veya şifre hatalı.' } : { ok: true }; });
     },
     signOut: function () { return db.auth.signOut().then(function () {}); },
 
@@ -83,27 +83,6 @@
         });
       }).then(function () {});
     },
-    videoUrl: function (v) { return db.storage.from('videos').getPublicUrl(v.storage_path).data.publicUrl; },
-
-    listUsers: function () {
-      return db.from('allowed_users').select('email').order('email').then(function (r) { fail(r.error); return r.data; });
-    },
-    addUser: function (email) {
-      email = clean(email);
-      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return Promise.reject(new Error('Geçerli bir e-posta adresi yazın.'));
-      var self = this;
-      return db.from('allowed_users').insert({ email: email }).then(function (r) {
-        if (r.error) {
-          if (/En fazla 5/.test(r.error.message)) throw new Error('En fazla 5 yetkili kişi eklenebilir.');
-          if (r.error.code === '23505') throw new Error('Bu e-posta zaten ekli.');
-          throw new Error(r.error.message);
-        }
-        return self.listUsers();
-      });
-    },
-    removeUser: function (email) {
-      var self = this;
-      return db.from('allowed_users').delete().eq('email', clean(email)).then(function (r) { fail(r.error); return self.listUsers(); });
-    }
+    videoUrl: function (v) { return db.storage.from('videos').getPublicUrl(v.storage_path).data.publicUrl; }
   };
 })();

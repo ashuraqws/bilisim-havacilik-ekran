@@ -4,7 +4,7 @@
 
 **Goal:** Yetkili en fazla 5 kişinin giriş yapıp video yükleyebildiği, videonun tarih aralığı ve günlük saat penceresinde "her N slaytta bir" siteye otomatik girdiği bir admin paneli.
 
-**Architecture:** Statik site (GitHub Pages) + Supabase (Auth: e-posta bağlantısı, Postgres: `allowed_users`, `videos`, Storage: `videos` bucket). Site, kiosk'ta kütüphane bağımlılığı olmadan Supabase REST'i `fetch` ile okur; admin sayfası `admin/` altında, Supabase JS istemcisiyle çalışır. Zamanlama kuralları tek bir saf modülde (`schedule.js`) durur; hem site hem admin kullanır.
+**Architecture:** Statik site (GitHub Pages) + Supabase (Auth: kullanıcı adı + şifre, Postgres: `admin_user`, `videos`, Storage: `videos` bucket). Site, kiosk'ta kütüphane bağımlılığı olmadan Supabase REST'i `fetch` ile okur; admin sayfası `admin/` altında, Supabase JS istemcisiyle çalışır. Zamanlama kuralları tek bir saf modülde (`schedule.js`) durur; hem site hem admin kullanır.
 
 **Tech Stack:** Vanilla HTML/CSS/JS (derleme yok), Supabase REST + Auth + Storage, `node:assert` ile testler.
 
@@ -13,7 +13,7 @@
 ## Global Constraints
 
 - Derleme adımı yok; kiosk sitesi (`index.html`) CDN'e bağımlı olmayacak.
-- Yetkili e-posta listesi en fazla 5 kişi; giriş e-posta sihirli bağlantısıyla; e-posta karşılaştırması büyük/küçük harfe duyarsız.
+- Tek yönetici; giriş kullanıcı adı + şifreyle (Supabase Auth; panel adresi `kullanici@pano.local` olarak dahili türetir); kullanıcı adı büyük/küçük harfe duyarsız.
 - Video süresi: tarih aralığı (`start_date`..`end_date`, ikisi de dahil) + her gün için `daily_from`..`daily_to` (HH:MM, bitiş dahil değil; başlangıç > bitiş ise gece yarısını aşar) + isteğe bağlı hafta günleri (1=Pzt..7=Paz).
 - Sıklık: `every_n` slaytta bir, varsayılan 10, video başına ayarlanabilir.
 - Canlı yayın bu planın DIŞINDA.
@@ -28,7 +28,7 @@
 - `now` tam `daily_to` (16:10) iken video aktif değil; tam `daily_from` (08:50) iken aktif.
 - `end_date` bugün ise aktif (dahil); `start_date` yarın ise `scheduled`.
 - Aktif video yoksa site hiçbir şey eklemez; ağ hatasında son liste (localStorage önbelleği) kullanılır, ekran boş kalmaz.
-- 6. e-posta eklenmeye çalışılırsa reddedilir; aynı e-posta farklı harf boyutuyla iki kez eklenemez.
+- Kişi yönetimi yoktur; yetki RLS'te tek yönetici kullanıcıya verilir.
 - 50 MB'ı aşan veya video olmayan dosya, yükleme başlamadan Türkçe mesajla reddedilir.
 
 ---
@@ -62,15 +62,14 @@
 
 `AdminApi` (admin/api.js; MockApi ve SupabaseApi aynı yüzeyi uygular, hepsi Promise döner):
 - `mode: 'mock' | 'supabase'`
-- `getSession(): {email: string} | null`
-- `signIn(email: string): {ok: boolean, message: string}`
+- `getSession(): {username: string} | null`
+- `signIn(username: string, password: string): {ok: boolean, message: string}`
 - `signOut(): void`
 - `listVideos(): Video[]`
 - `uploadVideo(file: File, meta: Omit<Video,'id'|'storage_path'|'created_at'|'created_by'>, onProgress: (p: number) => void): Video` (50 MB / tür kontrolü burada, `Error` ile Türkçe mesaj)
 - `updateVideo(id: string, patch: Partial<Video>): Video`
 - `deleteVideo(id: string): void`
 - `videoUrl(video: Video): string`
-- `listUsers(): {email: string}[]`, `addUser(email: string): {email: string}[]` (6. kişide hata), `removeUser(email: string): {email: string}[]`
 
 `RemoteVideos` (remote-videos.js, `window.RemoteVideos`):
 - `refresh(): Promise<void>` (60 sn'de bir, hata olursa önbellek `localStorage['v5videos']`)
@@ -78,7 +77,7 @@
 
 Site tarafı slayt nesnesi: `{ video: <URL>, title, topic: lastTopic }` (mevcut video slaytı mekanizmasını `app.js` build içinde zaten kullanır).
 
-Supabase şeması: `allowed_users(email text primary key)` (en fazla 5 satır, trigger); `videos` tablosu Video alanlarıyla (`id uuid default gen_random_uuid()`); RLS: `videos` ve storage okuma anon'a açık, yazma yalnız e-postası `allowed_users`'ta olanlara.
+Supabase şeması: `admin_user(id uuid)` (tek yönetici; `is_admin()` = `auth.uid()` bu tabloda mı); `videos` tablosu Video alanlarıyla (`id uuid default gen_random_uuid()`); RLS: `videos` ve storage okuma anon'a açık, yazma yalnız `is_admin()` olanlara.
 
 ---
 
@@ -95,8 +94,8 @@ Supabase şeması: `allowed_users(email text primary key)` (en fazla 5 satır, t
 
 **Files:** Create `supabase/setup.sql`, `SETUP-ADMIN.md`.
 
-- [ ] `setup.sql`: tablolar, 5 kişi sınırı trigger'ı, RLS politikaları, `videos` bucket (public read) ve yazma politikaları. Buluta uygulanmaz.
-- [ ] `SETUP-ADMIN.md`: proje açma, SQL'i çalıştırma, ilk e-postayı ekleme, `config.js`'e URL ve anon key yazma (service_role yazma).
+- [ ] `setup.sql`: tablolar, tek yönetici tablosu, RLS politikaları, `videos` bucket (public read) ve yazma politikaları. Buluta uygulanmaz.
+- [ ] `SETUP-ADMIN.md`: proje açma, yönetici kullanıcısını oluşturma, SQL'i çalıştırma, `config.js`'e URL ve anon key yazma (service_role yazma).
 
 ### Task 3: Gerçek API (Sonnet)
 
@@ -120,9 +119,9 @@ Supabase şeması: `allowed_users(email text primary key)` (en fazla 5 satır, t
 **Files:** Create `admin/index.html`, `admin/admin.css`, `admin/admin.js`, `admin/mock-api.js`.
 **Consumes:** `AdminApi` sözleşmesi; `const api = window.AdminApi || window.MockApi`.
 
-- [ ] `mock-api.js`: sözleşmeyi localStorage ile uygular, örnek verilerle (aktif, planlı, bitmiş videolar; 3 yetkili e-posta); `mode: 'mock'`.
-- [ ] Giriş ekranı: e-posta ile bağlantı iste.
-- [ ] Dashboard: video ekleme kartı (sürükle-bırak, başlık, tarih aralığı, günlük saat penceresi, hafta günleri, sıklık), "şu an aktif" önizleme kartları (kalan süre), planlı ve bitmiş listeler, yetkili kişiler kartı (en fazla 5), yükleme ilerlemesi, silme/uzatma/açma-kapama.
+- [ ] `mock-api.js`: sözleşmeyi localStorage ile uygular, örnek verilerle (aktif, planlı, bitmiş videolar); `mode: 'mock'`.
+- [ ] Giriş ekranı: kullanıcı adı ve şifre (demo: `pano` / `1234`).
+- [ ] Dashboard: video ekleme kartı (sürükle-bırak, başlık, tarih aralığı, günlük saat penceresi, hafta günleri, sıklık), "şu an aktif" önizleme kartları (kalan süre), planlı ve bitmiş listeler, yükleme ilerlemesi, silme/uzatma/açma-kapama.
 - [ ] Tasarım: sitenin açık teması (gri-beyaz zemin, mavi vurgu), kiosk dışı normal ekran, duyarlı, erişilebilir, Türkçe.
 - [ ] Doğrula: tarayıcıda mock ile tüm akışlar; ekran görüntüsü.
 

@@ -3,14 +3,14 @@
   'use strict';
   var API = window.AdminAPI, S = window.Schedule;
   var CFG = window.APP_CONFIG || {};
-  var MAX_MB = CFG.MAX_VIDEO_MB || 50, MAX_PEOPLE = 5, SLIDE_SEC = 18;
+  var MAX_MB = CFG.MAX_VIDEO_MB || 50, SLIDE_SEC = 18;
   var DAYS = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'];
   var DAYS_LONG = ['Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi', 'Pazar'];
   var MONTHS = ['Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz', 'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara'];
   var MONTHS_LONG = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
   var REDUCED = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  var me = null, videos = [], people = [], urls = {}, sig = '', chosen = null, picked = [1, 2, 3, 4, 5, 6, 7];
+  var me = null, videos = [], urls = {}, sig = '', chosen = null, picked = [1, 2, 3, 4, 5, 6, 7];
   var $ = function (id) { return document.getElementById(id); };
 
   /* ---------- yardımcılar ---------- */
@@ -39,9 +39,6 @@
   }
   function mb(bytes) { return (bytes / 1048576).toFixed(1).replace('.', ',') + ' MB'; }
   function msg(e) { return (e && e.message) || 'Beklenmeyen bir hata oldu. Tekrar dene.'; }
-  function initials(email) { var s = String(email).split('@')[0].replace(/[^a-zA-ZçğıöşüÇĞİÖŞÜ]/g, ''); return (s.charAt(0) || '?').toLocaleUpperCase('tr'); }
-  var TINTS = [['#e8f1ff', '#0a55cc'], ['#e3f5ec', '#0f6b4b'], ['#fff3d9', '#7a4a00'], ['#fde8ef', '#a3264f'], ['#eceff5', '#3a4a60']];
-  function tint(email) { var h = 0; for (var i = 0; i < email.length; i++) h = (h * 31 + email.charCodeAt(i)) >>> 0; return TINTS[h % TINTS.length]; }
 
   /* ---------- bildirim ve onay ---------- */
   var toastT;
@@ -197,23 +194,6 @@
       $('live').innerHTML = ''; $('summary').textContent = 'Liste alınamadı.';
     });
   }
-  function loadPeople() {
-    return API.listPeople().then(function (list) { people = (list || []).map(function (p) { return p.email; }); drawPeople(); })
-      .catch(function (e) { $('personErr').textContent = 'Kişiler alınamadı: ' + msg(e); });
-  }
-  function drawPeople() {
-    var n = people.length, full = n >= MAX_PEOPLE;
-    $('peopleCount').innerHTML = '<span class="meter" aria-hidden="true">' + [0, 1, 2, 3, 4].map(function (i) { return '<i' + (i < n ? ' class="on"' : '') + '></i>'; }).join('') + '</span>' + n + '/' + MAX_PEOPLE;
-    $('people').innerHTML = people.map(function (e) {
-      var t = tint(e), self = me && e === me.email.toLowerCase(), last = n <= 1;
-      return '<li class="person"><span class="av" style="background:' + t[0] + ';color:' + t[1] + '" aria-hidden="true">' + esc(initials(e)) + '</span>' +
-        '<span class="person-m">' + esc(e) + (self ? '<small>Sen</small>' : '') + '</span>' +
-        '<button class="btn sm icon quiet" data-act="person-del" data-email="' + esc(e) + '"' + (last ? ' disabled title="Son yetkili silinemez"' : '') +
-        ' aria-label="' + esc(e) + ' adresini kaldır">' + icon('trash') + '</button></li>';
-    }).join('');
-    $('personEmail').disabled = $('personBtn').disabled = full;
-    $('personHelp').textContent = full ? 'Liste dolu. Yeni kişi için önce birini çıkar.' : 'En fazla ' + MAX_PEOPLE + ' kişi giriş yapabilir. Eklenen kişi kendi e-postasıyla girer.';
-  }
 
   /* ---------- liste işlemleri ---------- */
   function byId(id) { for (var i = 0; i < videos.length; i++) if (String(videos[i].id) === id) return videos[i]; return null; }
@@ -223,7 +203,6 @@
   document.addEventListener('click', function (e) {
     var b = e.target.closest('[data-act]'); if (!b || b.disabled) return;
     var act = b.dataset.act;
-    if (act === 'person-del') return delPerson(b.dataset.email);
     var v = byId(b.dataset.id); if (!v) return;
     var today = ymd(new Date());
     if (act === 'pause') return patch(v, { enabled: false }, '“' + v.title + '” durduruldu.');
@@ -240,24 +219,6 @@
           .catch(function (er) { toast(msg(er), true); });
       });
     }
-  });
-  function delPerson(email) {
-    var self = me && email === me.email.toLowerCase();
-    confirmBox('Yetki kaldırılsın mı?', email + ' artık panele giriş yapamaz.' + (self ? ' Bu senin adresin; çıkış yapmış olursun.' : ''), 'Yetkiyi kaldır').then(function (ok) {
-      if (!ok) return;
-      API.removePerson(email).then(function () { toast(email + ' kaldırıldı.'); return self ? signOut() : loadPeople(); })
-        .catch(function (e) { toast(msg(e), true); });
-    });
-  }
-  $('personForm').addEventListener('submit', function (e) {
-    e.preventDefault();
-    var inp = $('personEmail'), email = inp.value.trim().toLowerCase(), err = $('personErr');
-    err.textContent = ''; inp.removeAttribute('aria-invalid');
-    var bad = !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? 'Geçerli bir e-posta adresi yaz.' : people.indexOf(email) >= 0 ? 'Bu adres zaten listede.' : '';
-    if (bad) { err.textContent = bad; inp.setAttribute('aria-invalid', 'true'); inp.focus(); return; }
-    $('personBtn').disabled = true;
-    API.addPerson(email).then(function () { inp.value = ''; toast(email + ' eklendi.'); return loadPeople(); })
-      .catch(function (er) { err.textContent = msg(er); inp.setAttribute('aria-invalid', 'true'); $('personBtn').disabled = false; });
   });
   $('retry').addEventListener('click', loadVideos);
 
@@ -372,32 +333,30 @@
   function resetDates() { var t = ymd(new Date()); F.start.value = t; F.end.value = addDays(t, 7); }
 
   /* ---------- giriş ve oturum ---------- */
-  var MOCK = false;
   function status(text, ok) { var s = $('loginStatus'); s.className = 'status ' + (ok ? 'ok' : 'bad'); s.textContent = text; }
   function showLogin() { $('app').hidden = true; $('login').hidden = false; }
   function showApp(session) {
     me = session; $('login').hidden = true; $('app').hidden = false;
-    $('whoMail').textContent = session.email; $('whoMail').title = session.email;
-    loadVideos(); loadPeople();
+    $('whoUser').textContent = session.username; $('whoUser').title = session.username;
+    loadVideos();
   }
   function signOut() {
     return Promise.resolve().then(function () { return API.signOut(); }).catch(function () {}).then(function () {
-      me = null; videos = []; sig = ''; showLogin(); status('Çıkış yaptın.', true); $('loginEmail').focus();
+      me = null; videos = []; sig = ''; showLogin(); $('loginPass').value = ''; status('Çıkış yaptın.', true); $('loginUser').focus();
     });
   }
   $('signOut').addEventListener('click', signOut);
   $('loginForm').addEventListener('submit', function (e) {
     e.preventDefault();
-    var inp = $('loginEmail'), email = inp.value.trim();
-    $('loginStatus').textContent = ''; setErr('loginErr', '', inp);
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setErr('loginErr', 'Geçerli bir e-posta adresi yaz.', inp); inp.focus(); return; }
-    var btn = $('loginBtn'); btn.disabled = true; btn.lastChild.textContent = 'Gönderiliyor';
-    API.signIn(email).then(function (r) {
-      if (r && r.ok === false) { status(r.message, false); return; }
-      if (MOCK) return API.getSession().then(function (s) { if (s) showApp(s); });
-      status('Bağlantı ' + email + ' adresine gönderildi. E-postandaki bağlantıya tıkla; bu sayfa açılınca giriş yapmış olursun.', true);
-    }).catch(function (er) { status(msg(er), false); })
-      .then(function () { btn.disabled = false; btn.lastChild.textContent = 'Giriş bağlantısı gönder'; });
+    var user = $('loginUser'), pass = $('loginPass');
+    $('loginStatus').textContent = ''; setErr('loginErr', '', [user, pass]);
+    if (!user.value.trim() || !pass.value) { setErr('loginErr', 'Kullanıcı adı ve şifreyi yaz.', !user.value.trim() ? user : pass); return; }
+    var btn = $('loginBtn'); btn.disabled = true; btn.lastChild.textContent = 'Giriş yapılıyor';
+    API.signIn(user.value.trim(), pass.value).then(function (r) {
+      if (r && r.ok === false) { setErr('loginErr', r.message, pass); pass.value = ''; pass.focus(); return; }
+      return API.getSession().then(function (s) { if (s) showApp(s); else setErr('loginErr', 'Giriş yapılamadı. Tekrar dene.', user); });
+    }).catch(function (er) { setErr('loginErr', msg(er), user); })
+      .then(function () { btn.disabled = false; btn.lastChild.textContent = 'Giriş yap'; });
   });
 
   /* ---------- başlangıç ---------- */
@@ -406,7 +365,7 @@
   drawDays(); drawRot(); drawFormBand(); resetDates();
   setInterval(function () { if (me) render(false); }, 30000);
   API.init().then(function (r) {
-    MOCK = !!(r && r.mock); $('demo').hidden = !MOCK;
+    $('demo').hidden = !(r && r.mock);
     return API.getSession();
   }).then(function (s) { if (s) showApp(s); else showLogin(); })
     .catch(function (e) { showLogin(); status(msg(e), false); });
