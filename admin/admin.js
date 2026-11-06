@@ -115,6 +115,7 @@
       : 'Şu an ekranda video yok; slaytlar normal akışında dönüyor.';
     if (!force && s === sig) { tick(g, now); return; }
     sig = s;
+    $('sLive').textContent = g.live.length; $('sPlan').textContent = g.plan.length; $('sDone').textContent = g.done.length;
     $('liveCount').textContent = g.live.length; $('planCount').textContent = g.plan.length; $('doneCount').textContent = g.done.length;
     $('live').innerHTML = g.live.length ? g.live.map(function (v) { return liveCard(v, now); }).join('')
       : '<div class="empty">' + icon('film') + '<div><b>Şu an yayında video yok</b>' +
@@ -191,14 +192,15 @@
       videos = list || []; $('loadErr').hidden = true; render(true);
     }).catch(function (e) {
       $('loadErrText').textContent = 'Videolar alınamadı: ' + msg(e); $('loadErr').hidden = false;
-      $('live').innerHTML = ''; $('summary').textContent = 'Liste alınamadı.';
+      $('live').innerHTML = ''; $('plan').innerHTML = ''; $('done').innerHTML = ''; $('summary').textContent = 'Liste alınamadı.';
     });
   }
 
   /* ---------- liste işlemleri ---------- */
   function byId(id) { for (var i = 0; i < videos.length; i++) if (String(videos[i].id) === id) return videos[i]; return null; }
   function patch(v, p, done) {
-    return API.updateVideo(v.id, p).then(function () { toast(done); return loadVideos(); }).catch(function (e) { toast(msg(e), true); });
+    var btn = document.activeElement; if (btn && btn.dataset && btn.dataset.act) btn.disabled = true;
+    return API.updateVideo(v.id, p).then(function () { toast(done); return loadVideos(); }).catch(function (e) { toast(msg(e), true); if (btn) btn.disabled = false; });
   }
   document.addEventListener('click', function (e) {
     var b = e.target.closest('[data-act]'); if (!b || b.disabled) return;
@@ -318,7 +320,7 @@
     if (!validate()) return;
     var meta = { title: F.title.value.trim(), start_date: F.start.value, end_date: F.end.value, daily_from: F.from.value, daily_to: F.to.value,
       weekdays: picked.slice().sort(), every_n: Number(F.n.value), enabled: $('enabled').checked };
-    var btn = $('addBtn'); btn.disabled = true; btn.lastChild.textContent = 'Yükleniyor';
+    var btn = $('addBtn'); $('addForm').classList.add('busy'); btn.disabled = true; btn.lastChild.textContent = 'Yükleniyor';
     progress(0);
     API.uploadVideo(chosen, meta, progress).then(function () {
       toast('“' + meta.title + '” eklendi. Ekrana 1 dakika içinde yansır.');
@@ -327,7 +329,7 @@
     }).catch(function (er) {
       setErr('formErr', msg(er));
     }).then(function () {
-      btn.disabled = false; btn.lastChild.textContent = 'Yükle ve kaydet'; $('progress').hidden = true;
+      $('addForm').classList.remove('busy'); btn.disabled = false; btn.lastChild.textContent = 'Yükle ve kaydet'; $('progress').hidden = true;
     });
   });
   function resetDates() { var t = ymd(new Date()); F.start.value = t; F.end.value = addDays(t, 7); }
