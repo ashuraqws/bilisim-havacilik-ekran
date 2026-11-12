@@ -70,8 +70,7 @@
       var ms = target - n;
       if (ms > 0) {
         var s = Math.floor(ms / 1000);
-        var p = function (x) { return ('0' + x).slice(-2); };
-        yc.textContent = 'YKS 2027 · ' + Math.floor(s / 86400) + ' gün ' + p(Math.floor(s % 86400 / 3600)) + ':' + p(Math.floor(s % 3600 / 60)) + ':' + p(s % 60);
+        yc.textContent = Math.floor(s / 86400) + ' gün ' + Math.floor(s % 86400 / 3600) + ' saat';
       } else {
         yc.textContent = 'YKS 2027 başladı';
       }
