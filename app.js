@@ -58,13 +58,26 @@
   }
 
   function clockView() {
-    var n = new Date(), hh = ('0' + n.getHours()).slice(-2), mm = ('0' + n.getMinutes()).slice(-2);
-    var date = n.toLocaleDateString('tr-TR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-    var dig = function (c) { return '<span class="fd">' + c + '</span>'; };
     var el = document.createElement('section');
     el.className = 'slide clock';
-    el.innerHTML = '<div class="flipclock">' + dig(hh[0]) + dig(hh[1]) + '<b>:</b>' + dig(mm[0]) + dig(mm[1]) + '</div><div class="cdate">' + date + '</div>';
-    return { el: el, run: null };
+    el.innerHTML = '<div class="flipclock"><span class="fd"></span><span class="fd"></span><b>:</b><span class="fd"></span><span class="fd"></span></div><div class="ycount"></div><div class="cdate"></div>';
+    var ds = el.querySelectorAll('.fd'), dt = el.querySelector('.cdate'), yc = el.querySelector('.ycount');
+    var target = new Date(2027, 5, 19, 10, 15);
+    function tick() {
+      var n = new Date(), hh = ('0' + n.getHours()).slice(-2), mm = ('0' + n.getMinutes()).slice(-2);
+      ds[0].textContent = hh[0]; ds[1].textContent = hh[1]; ds[2].textContent = mm[0]; ds[3].textContent = mm[1];
+      dt.textContent = n.toLocaleDateString('tr-TR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+      var ms = target - n;
+      if (ms > 0) {
+        var s = Math.floor(ms / 1000);
+        yc.textContent = "YKS 2027'ye " + Math.floor(s / 86400) + ' gün ' + Math.floor(s % 86400 / 3600) + ' saat ' + Math.floor(s % 3600 / 60) + ' dakika ' + (s % 60) + ' saniye';
+      } else {
+        yc.textContent = 'YKS 2027 başladı';
+      }
+    }
+    tick();
+    var iv = setInterval(tick, 1000);
+    return { el: el, run: function () { return function () { clearInterval(iv); }; } };
   }
 
   function build(s) {
