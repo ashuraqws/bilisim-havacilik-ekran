@@ -78,7 +78,7 @@
   var GROUPS = [
     ['Bilişim', ['--bg', '--ink', '--ink2', '--bi']],
     ['Havacılık', ['--hvbg', '--hvink', '--hv']],
-    ['Ortak', ['--panel', '--menu', '--gv', '--code', '--codeTx']]
+    ['Ortak', ['--panel', '--menu', '--gv', '--code', '--codeTx', '--yks']]
   ];
   GROUPS.forEach(function (g) {
     var h = document.createElement('h4');
