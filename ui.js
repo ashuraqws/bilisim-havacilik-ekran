@@ -13,7 +13,8 @@
     ['--hvink', 'Başlık ve metin (havacılık)', '#1d3d33'],
     ['--gv', 'Yeşil vurgu (atölye)', '#1fbf75'],
     ['--code', 'Kod ve video zemini', '#0c1424'],
-    ['--codeTx', 'Kod yazısı', '#cfe2ff']
+    ['--codeTx', 'Kod yazısı', '#cfe2ff'],
+    ['--yks', 'YKS geri sayım yazısı', '#d62828']
   ];
   var DEF = {};
   TOKENS.forEach(function (d) { DEF[d[0]] = d[2]; });
