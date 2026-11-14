@@ -1,7 +1,7 @@
 /* yayin-v3 — slayt yöneticisi: otomatik akış, çeşitli geçişler, kalıcı çalışma.
    Aynı anda en fazla 2 slayt DOM'da; eski slayt geçiş sonrası temizlenir. */
 (function () {
-  var DWELL = 18000, TRANS = 1300, CLOCK_MS = 23000;
+  var DWELL = 18000, TRANS = 1300, CLOCK_MS = 30000;
   var stage = document.getElementById('stage'), host = document.getElementById('slides');
   var sweep = document.getElementById('sweep'), bar = document.getElementById('bar');
   var EASE = 'cubic-bezier(.7,0,.2,1)';
